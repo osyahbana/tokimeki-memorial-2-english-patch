@@ -57,7 +57,7 @@ ROWS = ["ＡＢＣＤＥ", "ＦＧＨＩＪ", "ＫＬＭＮＯ", "ＰＱＲＳ�
 SPECIAL = {0x8144: 63, 0x8166: 67, 0x817C: 69, 0x815B: 69, 0x8140: 0}
 
 
-def source():
+def source(sound=SOUND):
     sp = "\n".join("    ori   $v1, $zero, %#x\n    beq   $t5, $v1, letter\n    ori   $t6, $zero, %d"
                    % (code, idx) for code, idx in SPECIAL.items())
     return f"""
@@ -128,7 +128,7 @@ append:                           # the original append, with t3/t4
     ori   $v1, $zero, 2
     bne   $t0, $v1, inc
     addiu $t0, $t0, 1
-    jal   {SOUND:#x}
+    jal   {sound:#x}
     ori   $a0, $zero, 5
     j     {APPEND_EXIT:#x}
     nop
@@ -181,11 +181,11 @@ def _count(src):
                    and not l.strip().startswith(".")))
 
 
-def build():
+def build(sound=SOUND):
     """(code bytes at CODE_AT, {label: address})."""
     from keystone import Ks, KS_ARCH_MIPS, KS_MODE_MIPS32, KS_MODE_LITTLE_ENDIAN
     ks = Ks(KS_ARCH_MIPS, KS_MODE_MIPS32 + KS_MODE_LITTLE_ENDIAN)
-    src = source()
+    src = source(sound)
     code = bytes(ks.asm(src, CODE_AT)[0])
     assert len(code) == 4 * _count(src), (len(code), 4 * _count(src))
     head = src.split("\nhook_bs:")[0]
@@ -214,7 +214,12 @@ def patch_module(mod):
     syms_text = bytes(m[SYMS - BASE:CODE_END - BASE])
     if not syms_text.startswith("　、。".encode("cp932")) or syms_text[SYMS_CUT - SYMS - 2:SYMS_CUT - SYMS] != "ｚ".encode("cp932"):
         raise ValueError("not the expected symbol list")
-    code, syms = build()
+    sound_word = word(0x800C8870)
+    sounds = [a for a in (SOUND, SOUND - 4)
+              if sound_word == 0x0C000000 | ((a & 0x0FFFFFFF) >> 2)]
+    if len(sounds) != 1:
+        raise ValueError("unrecognized name-entry sound call")
+    code, syms = build(sounds[0])
     put(SYMS_CUT, b"\0\0\0\0")
     put(CODE_AT, code + b"\0" * (CODE_END - CODE_AT - len(code)))
     put(APPEND_AT, _j(syms["hook_append"]) + b"\0\0\0\0")

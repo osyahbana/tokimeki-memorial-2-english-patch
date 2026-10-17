@@ -18,6 +18,7 @@ into the same buffer), taking the smallest such value if several modules
 use the group. That is an inference, checked on screen for one scene.
 """
 import collections
+import hashlib
 import struct
 
 import numpy as np
@@ -25,6 +26,26 @@ import numpy as np
 SECTOR = 2048
 LOADER = 0x800F3C10           # main engine: load variant of a group
 JAL_LOADER = struct.pack("<I", (3 << 26) | ((LOADER >> 2) & 0x3FFFFFF))
+
+
+def _loader_call(data):
+    """Recognise the measured Japan-original loader; retain Rev 1 behavior.
+
+    Original Discs 2-5 load the engine from sector 1559 at 0x800C0000.
+    The loader moved +8 bytes, to 0x800F3C18. Verify both its header-read
+    entry and its offset-table/span-read continuation before deriving any
+    larger capacity from modules calling that address. No blanket pointer
+    delta is valid for this engine.
+    """
+    base = 1559 * SECTOR
+    spans = (
+        (0x33C18, 0x33C74, "f340c8904d6069e84d5747f26ab930e271b8f11f36da1e9f571bee7b2d10b440"),
+        (0x33DD0, 0x33EB4, "0f9e57a4a4eb3088bc78d0f8bcb0a2a433558f64d349634dca611a99742a5314"),
+    )
+    if all(hashlib.sha256(data[base + lo:base + hi]).hexdigest() == digest
+           for lo, hi, digest in spans):
+        return struct.pack("<I", (3 << 26) | ((0x800F3C18 >> 2) & 0x3FFFFFF))
+    return JAL_LOADER
 
 
 class Group:
@@ -69,10 +90,11 @@ def find_groups(data):
 
 def _capabilities(data, groups):
     # event modules: clusters of sectors that call the loader
+    jal_loader = _loader_call(data)
     sites = set()
     p = 0
     while True:
-        p = data.find(JAL_LOADER, p)
+        p = data.find(jal_loader, p)
         if p < 0:
             break
         if p % 4 == 0:

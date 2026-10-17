@@ -3030,7 +3030,7 @@
      "en": "How could I possibly forget?"},
     {"at": [497, 514], "speaker": "{name1}",
      "ja": "嬉しいな、{char:20}から\nプレゼントがもらえるなんて）",
-     "en": "I'm so happy to get a present from {char:20}\nlike this.)"}
+     "en": "A gift from {char:20}!\nI'm so happy.)"}
    ]},
   {"key": "G336000-669edc8c", "location": "In the Car", "kind": "file", "room": 4384, "found": {"5": [224253]},
    "messages": [

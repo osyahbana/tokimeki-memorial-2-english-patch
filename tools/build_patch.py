@@ -17,9 +17,9 @@
       packed  - must not grow (shorter text is zero-padded);
   * fixes EDC/ECC of every written sector.
 
-A scene that doesn't fit is left in Japanese and reported with the number of
-bytes it is over. Text-box rows (lines joined by {nobreak}) wider than 20 cells are reported
-as warnings.
+A scene that doesn't fit fails the staged build with its byte overage.
+Missing dialogue or literal speaker labels fail unless --allow-partial is
+explicit. Text-box rows wider than 20 cells are reported as warnings.
 """
 import collections
 import json
@@ -27,6 +27,9 @@ import os
 import shutil
 import struct
 import sys
+import argparse
+import tempfile
+from pathlib import Path
 
 import cdimage
 import extract_scripts as X
@@ -43,6 +46,7 @@ import scenes
 import script
 import translations
 import uitext
+import verify_output
 
 ROW_CELLS = 20          # cells in a text-box row after the speaker label (columns 4-23)
 # assumed widths of inserted strings (full-width cells)
@@ -194,7 +198,10 @@ class Builder:
                     self.errors.append("%s (sector %d): %d bytes too long; its container can't grow yet"
                                        % (b.key, b.off // 2048, len(new) - b.end))
                     continue
-                self.put(b.off, new + b"\0" * (b.end - len(new)))
+                # A packed block can also occupy a group variant with trailing
+                # unreachable code. Keep the in-place edit in the source data
+                # so relocating that group later copies the translated block.
+                self.pre(b.off, new + b"\0" * (b.end - len(new)))
                 self.done.append(b.key)
         for base, changes in bundles.items():
             self.rebuild_bundle(base, changes)
@@ -338,49 +345,43 @@ class Builder:
         self.done.extend(keys)
 
 
-def main(argv):
-    args, tl_dirs, exe, force = [], [], True, set()
-    pic_dir = os.path.join(translations.ROOT, "pictures")
-    pic_dir = pic_dir if os.path.isdir(pic_dir) else None
-    i = 0
-    while i < len(argv):
-        if argv[i] == "--tl":
-            tl_dirs.append(argv[i + 1]); i += 2
-        elif argv[i] == "--pictures":
-            pic_dir = argv[i + 1]; i += 2
-        elif argv[i] == "--no-exe":
-            exe = False; i += 1
-        elif argv[i] == "--move-group":          # testing: relocate this group anyway
-            force.add(int(argv[i + 1])); i += 2
-        else:
-            args.append(argv[i]); i += 1
-    src, dst = args
-    if os.path.exists(dst) and os.path.samefile(src, dst):
-        sys.exit("refusing to overwrite the original image")
+def _build(args):
+    src, dst = args.source, args.output
+    pic_dir = args.pictures
+    patch_code = not args.no_exe
     tl_problems = []
-    tl, names, ui = translations.load(tl_dirs or [translations.DEFAULT], with_ui=True, problems=tl_problems)
+    tl, names, ui = translations.load(args.tl or [translations.DEFAULT], with_ui=True, problems=tl_problems)
     print("translations: %d scenes, %d speaker names, %d menu/system strings" % (len(tl), len(names), len(ui)))
-
-    shutil.copyfile(src, dst)
-    cue = os.path.splitext(src)[0] + ".cue"
-    if os.path.exists(cue):
-        txt = open(cue).read().replace(os.path.basename(src), os.path.basename(dst))
-        open(os.path.splitext(dst)[0] + ".cue", "w").write(txt)
-    if exe:
-        name, secs = glyphpatch.patch_image(dst)
-        print("EXE %s patched (sectors %s)" % (name, secs))
-
     data = X.read_user_data(src)
     blocks = scenes.scan(data)
+    missing = verify_output.missing_dialogue(blocks, tl)
+    missing_labels = verify_output.missing_speakers(blocks, tl, names)
+    for problem in tl_problems:
+        print("INVALID TRANSLATION:", problem)
+    for problem in missing[:20]:
+        print("MISSING TRANSLATION: %(scene)s/%(offset)s" % problem)
+    if missing:
+        print("missing dialogue lines:", len(missing))
+    for problem in missing_labels[:20]:
+        print("MISSING SPEAKER: %(scene)s/%(offset)s (%(label)s)" % problem)
+    if tl_problems or ((missing or missing_labels) and not args.allow_partial):
+        print("Build stopped: fix translations or explicitly use --allow-partial for missing dialogue.")
+        return 1
     with open(src, "rb") as f:
         _, elba, esize = glyphpatch.find_exe(f)
-        exe = cdimage.read_user_data(f, elba, -(-esize // 2048))
-    bld = Builder(data, GR.find_groups(data), OV.find(data, exe))
-    bld.force_move = force
+        original_exe = cdimage.read_user_data(f, elba, -(-esize // 2048))
+    revision = glyphpatch.detect_revision(original_exe)
+    shutil.copyfile(src, dst)
+    if patch_code:
+        name, secs = glyphpatch.patch_image(dst)
+        print("EXE %s patched (sectors %s)" % (name, secs))
+    bld = Builder(data, GR.find_groups(data), OV.find(data, original_exe))
+    bld.force_move = set(args.move_group)
     n_ui = 0
     if ui:          # menu/system text and place names, in place, before scenes are rebuilt
+        packed_blocks = strpack.resolved_blocks(data, src)
         for u in uitext.scan(data, src) + uitext.scene_places(data, blocks):
-            if u.id not in ui or strpack.covers(u.module, u.addr):
+            if u.id not in ui or strpack.covers(u.module, u.addr, packed_blocks):
                 continue
             try:
                 b = uitext.encode(ui[u.id], u.ja, u.cells)
@@ -405,6 +406,10 @@ def main(argv):
         for n in notes:
             print("note: name table", n)
     bld.build(blocks, tl, names)
+    if bld.errors:
+        for error in bld.errors:
+            print("NOT PATCHED:", error)
+        return 1
     written = []
     with open(dst, "r+b") as f:
         for sec in sorted(bld.sectors):
@@ -423,7 +428,7 @@ def main(argv):
             assert f.tell() == bld.base_lba * cdimage.SECTOR
             for k, sec in enumerate(bld.append):
                 f.write(cdimage.make_form1(bld.base_lba + k, sec))
-    if exe:                                        # after the sector writes, which start from
+    if patch_code:                                 # after the sector writes, which start from
         secs = namepatch.patch_image(dst)          # the original bytes (the prompts share its sector)
         if secs:
             print("name entry patched (sectors %s)" % secs)
@@ -434,7 +439,7 @@ def main(argv):
     pics, pic_err = pictures.apply_manifest(dst, pic_dir) if pic_dir else ([], [])
     if pics:
         print("pictures patched: %s" % ", ".join(pics))
-    if exe:                                        # the date box tiles go with main_stats_hands.png
+    if patch_code:                                 # the date box tiles go with main_stats_hands.png
         secs, notes = datepatch.patch_image(dst)
         if secs:
             print("date box patched (sectors %s)" % secs)
@@ -463,11 +468,63 @@ def main(argv):
           % (len(bld.done), len(set(bld.done)), len(written), len(bld.moved), len(bld.moved_overlays), len(bld.append)))
     for w in bld.warnings:
         print("warning:", w)
-    bld.errors += pic_err + ["%s (kept in Japanese)" % p for p in tl_problems]
+    bld.errors += pic_err
+    dialogue = verify_output.verify_dialogue(data, new_data, blocks, original_exe,
+                                             verify_output.read_exe(dst), tl, names)
+    sectors = verify_output.verify_sectors(src, dst)
+    bld.errors += dialogue['errors'] + sectors['errors']
+    report = {'schema_version': 1, 'source_file': os.path.basename(src), 'revision': revision,
+              'passed': not bld.errors, 'complete_dialogue': not missing,
+              'complete_speakers': not missing_labels, 'missing_speakers': missing_labels,
+              'code_patches_enabled': patch_code, 'missing_dialogue': missing,
+              'dialogue': dialogue, 'sectors': sectors, 'menu_strings_patched': n_ui,
+              'pictures_patched': pics, 'warnings': sorted(set(bld.warnings)), 'errors': bld.errors}
+    Path(dst).with_suffix('.report.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
     for e in bld.errors:
         print("NOT PATCHED:", e)
     return 1 if bld.errors else 0
 
 
+def main(argv):
+    parser = argparse.ArgumentParser(description='Build and verify one English BIN in a temporary folder.')
+    parser.add_argument('source')
+    parser.add_argument('output')
+    parser.add_argument('--tl', action='append')
+    parser.add_argument('--pictures', default=str(Path(translations.ROOT) / 'pictures'))
+    parser.add_argument('--no-exe', action='store_true', help='developer diagnostic: skip glyph, name, EVS and date code patches')
+    parser.add_argument('--move-group', action='append', type=int, default=[])
+    parser.add_argument('--allow-partial', action='store_true', help='explicitly permit untranslated dialogue; reported in JSON')
+    args = parser.parse_args(argv)
+    source, output = Path(args.source), Path(args.output)
+    if any(c in output.name for c in '\"\r\n'):
+        parser.error('output filename cannot be represented in a CUE')
+    if output.suffix.lower() != '.bin':
+        parser.error('output must use the .bin extension')
+    protected = [source, source.with_suffix('.cue')]
+    targets = [output, output.with_suffix('.cue'), output.with_suffix('.report.json')]
+    if any(a.resolve() == b.resolve() or (a.exists() and b.exists() and os.path.samefile(a, b))
+           for a in protected for b in targets):
+        parser.error('output must not overwrite an original image or CUE')
+    output.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with tempfile.TemporaryDirectory(prefix='.tm2-build-', dir=output.parent) as tmp:
+            args.output = str(Path(tmp) / output.name)
+            rc = _build(args)
+            if rc:
+                print('Build failed; previous output files were preserved.')
+                return rc
+            cue = Path(args.output).with_suffix('.cue')
+            cue.write_text(f'FILE "{output.name}" BINARY\n  TRACK 01 MODE2/2352\n    INDEX 01 00:00:00\n', encoding='utf-8')
+            for staged in (Path(args.output), cue, Path(args.output).with_suffix('.report.json')):
+                os.replace(staged, output.parent / staged.name)
+    except (OSError, ValueError, AssertionError, KeyError, script.ScriptError) as error:
+        print('Build failed:', error)
+        return 1
+    print('Verified output:', output)
+    return 0
+
+
 if __name__ == "__main__":
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8', errors='backslashreplace')
     sys.exit(main(sys.argv[1:]))

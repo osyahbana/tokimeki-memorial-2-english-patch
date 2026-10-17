@@ -177,7 +177,7 @@ def _isvowel(reg, no, tmp="$a2"):
     nop"""
 
 
-def source():
+def source(strcpy=STRCPY):
     hi = lambda a: (a + 0x8000) >> 16 & 0xFFFF
     lo = lambda a: a & 0xFFFF
     return f"""
@@ -189,7 +189,7 @@ k2r:                              # a0 = destination, a1 = source
     sltiu $v0, $v0, 3
     bnez  $v0, k_go
     nop
-    j     {STRCPY:#x}             # not kana: plain strcpy
+    j     {strcpy:#x}             # not kana: plain strcpy
     nop
 k_go:
     lui   $t8, {hi(BUF):#x}
@@ -412,10 +412,10 @@ def _count(src):
                and not l.strip().startswith("."))
 
 
-def build():
+def build(strcpy=STRCPY):
     from keystone import Ks, KS_ARCH_MIPS, KS_MODE_MIPS32, KS_MODE_LITTLE_ENDIAN
     ks = Ks(KS_ARCH_MIPS, KS_MODE_MIPS32 + KS_MODE_LITTLE_ENDIAN)
-    src = source()
+    src = source(strcpy)
     code = bytes(ks.asm(src, CODE)[0])
     assert len(code) == 4 * _count(src), (len(code), 4 * _count(src))
     assert CODE + len(code) <= REGION_END, "converter too long: %#x" % (CODE + len(code))
@@ -426,14 +426,16 @@ def apply(m, base):
     """Patch module bytes m (bytearray loaded at base) in place."""
     def w(a):
         return struct.unpack_from("<I", m, a - base)[0]
-    jal_strcpy = 0x0C000000 | ((STRCPY & 0x0FFFFFFF) >> 2)
-    for h in HOOKS:
-        if w(h) != jal_strcpy:
-            raise ValueError("unexpected word at %#x" % h)
+    # The original release's libc is 0x6c earlier; both call sites must
+    # agree before installing a converter with the matching fallback.
+    matches = [a for a in (STRCPY, STRCPY - 0x6C)
+               if all(w(h) == 0x0C000000 | ((a & 0x0FFFFFFF) >> 2) for h in HOOKS)]
+    if len(matches) != 1:
+        raise ValueError("unexpected EVS strcpy calls")
     ptrs = list(struct.unpack_from("<%dI" % KANJI_N, m, KANJI_PTRS - base))
     ptrs = [EMPTY if REGION <= p < REGION_END else p for p in ptrs]
     struct.pack_into("<%dI" % KANJI_N, m, KANJI_PTRS - base, *ptrs)
-    code = build()
+    code = build(matches[0])
     blob = b"\0\0\0\0" + table() + b"\0" * 32 + code
     m[REGION - base:REGION_END - base] = blob + b"\0" * (REGION_END - REGION - len(blob))
     for h in HOOKS:

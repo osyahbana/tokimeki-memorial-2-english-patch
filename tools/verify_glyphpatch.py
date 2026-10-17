@@ -44,7 +44,7 @@ LOOKUP, RENDER_A, RENDER_B = gp.BLOCK_LO, gp.RENDER_A, gp.BLOCK_HI
 
 
 class Machine:
-    def __init__(self, exe):
+    def __init__(self, exe, revision="rev1"):
         mu = Uc(UC_ARCH_MIPS, UC_MODE_MIPS32 + UC_MODE_LITTLE_ENDIAN)
         mu.mem_map(0, 0x800000)
         size = struct.unpack_from("<I", exe, 0x1C)[0]        # t_size: what the BIOS loads
@@ -59,7 +59,8 @@ class Machine:
             v = 0xFFFFFFFF if (a0 * 7) % 13 == 0 else FONT_BASE + (a0 & 0xFFFF) * 32
             uc.reg_write(UC_MIPS_REG_V0, v)
             uc.reg_write(UC_MIPS_REG_PC, uc.reg_read(UC_MIPS_REG_RA))
-        mu.hook_add(UC_HOOK_CODE, stub, begin=gp.KROM2RAWADD, end=gp.KROM2RAWADD)
+        krom = gp.REVISIONS[revision]["krom2rawadd"]
+        mu.hook_add(UC_HOOK_CODE, stub, begin=krom, end=krom)
         self.writes = []
 
         def on_write(uc, access, addr, size, value, _):
@@ -141,13 +142,16 @@ def check_load_delays(blk):
 
 def main(path):
     exe = open(path, "rb").read()
+    revision = gp.detect_revision(exe)
+    print("revision:", revision, flush=True)
     new_exe = gp.patch_exe(exe)
-    blk, syms = gp.build()
+    blk, syms = gp.build(revision)
     bad = check_load_delays(blk)
     assert not bad, "load-delay hazards:\n" + "\n".join(bad)
     print("load delay slots: ok")
-    old, new = Machine(exe), Machine(new_exe)
+    old, new = Machine(exe, revision), Machine(new_exe, revision)
     buf = syms["buf"]
+    scratch = gp.REVISIONS[revision]["renderer_b_scratch"]
     stack = (0x801FFF00 - 0x40, 0x801FFF00)
 
     def writes_ok(ranges):
@@ -183,7 +187,7 @@ def main(path):
                 m.write(OUT, guard)
             ko, kn = old.krom, new.krom
             vo, vn = old.call(fn, src, OUT), new.call(fn, src, OUT)
-            assert writes_ok([stack, (OUT, OUT + 128), (buf, buf + 30), (0x800A1FB0, 0x800A1FB0 + 64)]), (name, hex(c))
+            assert writes_ok([stack, (OUT, OUT + 128), (buf, buf + 30), (scratch, scratch + 64)]), (name, hex(c))
             oo, on = old.read(OUT, 128 + GUARD), new.read(OUT, 128 + GUARD)
             assert vo == vn == 1, (name, hex(c))
             if c in pairs:

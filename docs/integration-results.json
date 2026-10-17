@@ -1,0 +1,206 @@
+{
+  "tested_at": "2026-10-17",
+  "upstream_commit": "401c95498289c8d6796ea13da05742c3126a6b0a",
+  "build_exit_code": 0,
+  "images": [
+    {
+      "schema_version": 1,
+      "source_file": "Tokimeki Memorial 2 (Japan) (Disc 1) (v1.0).bin",
+      "revision": "original",
+      "passed": true,
+      "complete_dialogue": true,
+      "code_patches_enabled": true,
+      "missing_dialogue": [],
+      "dialogue": {
+        "scene_instances": 145,
+        "verified_strings": 2140,
+        "errors": []
+      },
+      "sectors": {
+        "source_sha256": "bedc4490baf93463788509441d0a8aaaa4b0ccbd05c7d2feb6b6f5103dcd5a1f",
+        "output_sha256": "c7fed091a4d9137e7130b8ffec036c9fa1eccc037c50e2d36dd27bf67c60c819",
+        "changed_sectors": 540,
+        "appended_sectors": 18,
+        "errors": []
+      },
+      "menu_strings_patched": 570,
+      "pictures_patched": [
+        "pic-6bd6dd34c6@s2067:952",
+        "pic-93bf727d73@73750:1416",
+        "pic-460d957e5d@1004:1472",
+        "pic-642fc53202@r8364:516",
+        "pic-642fc53202@r8395:1648",
+        "pic-a256f52375@1006:1440",
+        "pic-68590248de@1005:1880",
+        "pic-9059d8176b@s1004:152",
+        "pic-ca45b87c63@1007:360",
+        "pic-1e3496eace@766:1988",
+        "pic-6ad7e3451f@768:1820"
+      ],
+      "warnings": [],
+      "errors": [],
+      "complete_speakers": true,
+      "missing_speakers": []
+    },
+    {
+      "schema_version": 1,
+      "source_file": "Tokimeki Memorial 2 (Japan) (Disc 2) (v1.0).bin",
+      "revision": "original",
+      "passed": true,
+      "complete_dialogue": true,
+      "code_patches_enabled": true,
+      "missing_dialogue": [],
+      "dialogue": {
+        "scene_instances": 1516,
+        "verified_strings": 32280,
+        "errors": []
+      },
+      "sectors": {
+        "source_sha256": "4060a20ce456b7a741d16aff8cad29a855f5b9ba1d02bda3552be9b8e3911046",
+        "output_sha256": "65196f3acc89753b991a99cc3572138bf2c03e7b1d5741572135810e965acfdb",
+        "changed_sectors": 2995,
+        "appended_sectors": 1486,
+        "errors": []
+      },
+      "menu_strings_patched": 6261,
+      "pictures_patched": [
+        "pic-460d957e5d@966:1472",
+        "pic-642fc53202@r11403:516",
+        "pic-642fc53202@r12419:1648",
+        "pic-a256f52375@968:1440",
+        "pic-68590248de@967:1880",
+        "pic-9059d8176b@s966:152",
+        "pic-ca45b87c63@969:360",
+        "pic-1e3496eace@728:1988",
+        "pic-6ad7e3451f@730:1820"
+      ],
+      "warnings": [
+        "DEFAULT-4bc5b52c/164+187+214+237+260+287+310+333+356+381+404+417: row is 25 cells (holds 20)",
+        "G_BOMB-a1d9e649/887+912+925+938+951+964+977+990+1003+1016+1029+1045+1067: row is 49 cells (holds 20)"
+      ],
+      "errors": [],
+      "complete_speakers": true,
+      "missing_speakers": []
+    },
+    {
+      "schema_version": 1,
+      "source_file": "Tokimeki Memorial 2 (Japan) (Disc 3) (v1.0).bin",
+      "revision": "original",
+      "passed": true,
+      "complete_dialogue": true,
+      "complete_speakers": true,
+      "missing_speakers": [],
+      "code_patches_enabled": true,
+      "missing_dialogue": [],
+      "dialogue": {
+        "scene_instances": 1365,
+        "verified_strings": 33176,
+        "errors": []
+      },
+      "sectors": {
+        "source_sha256": "10f8eb5265deb456945f37d5b2142ace22c7a6f189150c12a295a2129691ce46",
+        "output_sha256": "713566234c848a6a72d61c01c105ab19027ec7e68a1ee9d5472865f4824b3568",
+        "changed_sectors": 2907,
+        "appended_sectors": 1513,
+        "errors": []
+      },
+      "menu_strings_patched": 6515,
+      "pictures_patched": [
+        "pic-460d957e5d@966:1472",
+        "pic-642fc53202@r11122:516",
+        "pic-642fc53202@r11693:1648",
+        "pic-a256f52375@968:1440",
+        "pic-68590248de@967:1880",
+        "pic-9059d8176b@s966:152",
+        "pic-ca45b87c63@969:360",
+        "pic-1e3496eace@728:1988",
+        "pic-6ad7e3451f@730:1820"
+      ],
+      "warnings": [
+        "DEFAULT-4bc5b52c/164+187+214+237+260+287+310+333+356+381+404+417: row is 25 cells (holds 20)",
+        "G_BOMB-a1d9e649/887+912+925+938+951+964+977+990+1003+1016+1029+1045+1067: row is 49 cells (holds 20)"
+      ],
+      "errors": []
+    },
+    {
+      "schema_version": 1,
+      "source_file": "Tokimeki Memorial 2 (Japan) (Disc 4) (v1.0).bin",
+      "revision": "original",
+      "passed": true,
+      "complete_dialogue": true,
+      "code_patches_enabled": true,
+      "missing_dialogue": [],
+      "dialogue": {
+        "scene_instances": 1458,
+        "verified_strings": 34908,
+        "errors": []
+      },
+      "sectors": {
+        "source_sha256": "490183ded249c6dfa8f58dce591b7786c2dcb5919409c5cf71422037213bc9ff",
+        "output_sha256": "0b4436e005c1fc917433965e3cd21fb8ffc64f0c21fb8e2fc6675f3f4f233971",
+        "changed_sectors": 2950,
+        "appended_sectors": 1520,
+        "errors": []
+      },
+      "menu_strings_patched": 6983,
+      "pictures_patched": [
+        "pic-460d957e5d@966:1472",
+        "pic-642fc53202@r11451:516",
+        "pic-642fc53202@r12114:1648",
+        "pic-a256f52375@968:1440",
+        "pic-68590248de@967:1880",
+        "pic-9059d8176b@s966:152",
+        "pic-ca45b87c63@969:360",
+        "pic-1e3496eace@728:1988",
+        "pic-6ad7e3451f@730:1820"
+      ],
+      "warnings": [
+        "DEFAULT-4bc5b52c/164+187+214+237+260+287+310+333+356+381+404+417: row is 25 cells (holds 20)",
+        "G_BOMB-a1d9e649/887+912+925+938+951+964+977+990+1003+1016+1029+1045+1067: row is 49 cells (holds 20)"
+      ],
+      "errors": [],
+      "complete_speakers": true,
+      "missing_speakers": []
+    },
+    {
+      "schema_version": 1,
+      "source_file": "Tokimeki Memorial 2 (Japan) (Disc 5).bin",
+      "revision": "original",
+      "passed": true,
+      "complete_dialogue": true,
+      "code_patches_enabled": true,
+      "missing_dialogue": [],
+      "dialogue": {
+        "scene_instances": 1355,
+        "verified_strings": 38055,
+        "errors": []
+      },
+      "sectors": {
+        "source_sha256": "d67389a0be2d392335b8d54eb11533cef09466f43d310f5054666e4872edf73c",
+        "output_sha256": "bf7e6f472e686085a92741453e47979aeb7c073e97ea8c04bc36b70d76966d4e",
+        "changed_sectors": 2949,
+        "appended_sectors": 1551,
+        "errors": []
+      },
+      "menu_strings_patched": 7129,
+      "pictures_patched": [
+        "pic-460d957e5d@966:1472",
+        "pic-642fc53202@r11028:516",
+        "pic-642fc53202@r11439:1648",
+        "pic-a256f52375@968:1440",
+        "pic-68590248de@967:1880",
+        "pic-9059d8176b@s966:152",
+        "pic-ca45b87c63@969:360",
+        "pic-1e3496eace@728:1988",
+        "pic-6ad7e3451f@730:1820"
+      ],
+      "warnings": [
+        "DEFAULT-4bc5b52c/164+187+214+237+260+287+310+333+356+381+404+417: row is 25 cells (holds 20)",
+        "G_BOMB-a1d9e649/887+912+925+938+951+964+977+990+1003+1016+1029+1045+1067: row is 49 cells (holds 20)"
+      ],
+      "errors": [],
+      "complete_speakers": true,
+      "missing_speakers": []
+    }
+  ]
+}

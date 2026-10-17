@@ -412,7 +412,7 @@
  "ui-97c9414b90": {"ja": "クラブ／演劇部", "en": "Club: Drama", "max_bytes": 20, "where": ["2:OV1@8013e5ac", "3:OV1@8013e5ac", "4:OV1@8013e5ac", "5:OV1@8013e5ac"]},
  "ui-e71e7ab39a": {"ja": "クラブ／なし", "en": "Club: None", "max_bytes": 20, "where": ["2:OV1@8013e5c4", "3:OV1@8013e5c4", "4:OV1@8013e5c4", "5:OV1@8013e5c4"]},
  "ui-aef03f5b57": {"ja": "クラブ／テニス部", "en": "Club: Tennis", "max_bytes": 20, "where": ["2:OV1@8013e5dc", "3:OV1@8013e5dc", "4:OV1@8013e5dc", "5:OV1@8013e5dc"]},
- "ui-81280cd02c": {"ja": "クラブ／茶道部", "en": "Club: Tea Ceremony", "max_bytes": 20, "where": ["2:OV1@8013e5f4", "3:OV1@8013e5f4", "4:OV1@8013e5f4", "5:OV1@8013e5f4"]},
+ "ui-81280cd02c": {"ja": "クラブ／茶道部", "en": "Tea Ceremony Club", "max_bytes": 20, "where": ["2:OV1@8013e5f4", "3:OV1@8013e5f4", "4:OV1@8013e5f4", "5:OV1@8013e5f4"]},
  "ui-772d2676b6": {"ja": "クラブ／陸上部", "en": "Club: Track", "max_bytes": 20, "where": ["2:OV1@8013e60c", "3:OV1@8013e60c", "4:OV1@8013e60c", "5:OV1@8013e60c"]},
  "ui-a450049a6d": {"ja": "あー、先生じゃなきゃなー", "en": "Too bad she's a teacher!", "max_bytes": 28, "where": ["2:OV1@8013e624", "3:OV1@8013e624", "4:OV1@8013e624", "5:OV1@8013e624"]},
  "ui-d7e06bb777": {"ja": "クラス担任の先生。美人", "en": "Homeroom teacher. Pretty.", "max_bytes": 28, "where": ["2:OV1@8013e644", "3:OV1@8013e644", "4:OV1@8013e644", "5:OV1@8013e644"]},

@@ -2660,7 +2660,7 @@
      "en": "Not really.\nI'm just a little busy.\nIf it's nothing important, I have to go."},
     {"at": [1678, 1706, 1731], "speaker": "{name1}",
      "ja": "い、いや、ちょっと待って！\nもし、俺が{char:21}に何かして、\n怒らせたんだったら、ごめん、謝る！",
-     "en": "N-No, wait a second!\nIf I did something to upset you, {char:21},\nI'm sorry! I apologize!"},
+     "en": "N-No, wait a second!\nIf I upset you somehow, {char:21},\nI'm sorry! I apologize!"},
     {"at": [1779, 1801, 1843], "speaker": "Kasumi", "speaker_ja": "麻生",
      "ja": "そんなことないって。\nただ、私にも気分とか、機嫌とかそういうの\nあるっていうだけよ。",
      "en": "It's nothing like that.\nIt's just that I have my own moods\nand bad days too, that's all."},

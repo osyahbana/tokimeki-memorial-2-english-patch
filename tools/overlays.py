@@ -30,12 +30,13 @@ PTRS_ADDR = 0x80062198
 
 
 class Overlay:
-    def __init__(self, index, sector, size):
+    def __init__(self, index, sector, size, slot_addr=SLOT_ADDR, sizes_addr=SIZES_ADDR):
         self.index = index
         self.sector = sector
         self.size = size
         self.toc_off = TOC_SECTOR * SECTOR + TOC_OFF + 8 * index   # byte offset in disc data
-        self.size_addr = SIZES_ADDR + 4 * index                       # RAM address in the EXE
+        self.size_addr = sizes_addr + 4 * index
+        self.slot_addr = slot_addr
         self.packs = {}            # pack offset in overlay -> list of block offsets (pack-relative)
 
     @property
@@ -43,7 +44,7 @@ class Overlay:
         return self.sector * SECTOR
 
     def max_size(self):
-        return SLOT_END - SLOT_ADDR
+        return SLOT_END - self.slot_addr
 
 
 def exe_word(exe, addr):
@@ -52,15 +53,28 @@ def exe_word(exe, addr):
 
 def find(data, exe):
     """[Overlay] with their script packs, or [] if the tables don't look as expected."""
+    # Original Japan release and Rev 1 have the same eight resource entries
+    # but different resident-code/data addresses. Validate the entire table.
+    layouts = [(SLOT_DEST, SIZES_ADDR, PTRS_ADDR),
+               (SLOT_DEST + 0x10, SIZES_ADDR - 0x6C, PTRS_ADDR - 0x6C)]
+    matches = [(dest, sizes, ptrs) for dest, sizes, ptrs in layouts
+               if all(struct.unpack_from("<I", data, TOC_SECTOR * SECTOR + TOC_OFF + 8 * i)[0] == dest
+                      and exe_word(exe, ptrs + 4 * i) == 0x80010C40 + 8 * i
+                      for i in range(TOC_N))]
+    if len(matches) != 1:
+        return []
+    slot_dest, sizes_addr, ptrs_addr = matches[0]
     out = []
     for i in range(TOC_N):
         dest, sector = struct.unpack_from("<II", data, TOC_SECTOR * SECTOR + TOC_OFF + 8 * i)
-        if dest != SLOT_DEST or exe_word(exe, PTRS_ADDR + 4 * i) != 0x80010C40 + 8 * i:
+        if dest != slot_dest or exe_word(exe, ptrs_addr + 4 * i) != 0x80010C40 + 8 * i:
             return []
-        size = exe_word(exe, SIZES_ADDR + 4 * i)
+        size = exe_word(exe, sizes_addr + 4 * i)
         if not size:
             continue
-        ov = Overlay(i, sector, size)
+        if size > SLOT_END - (0x80000000 | slot_dest) or (sector * SECTOR + size) > len(data):
+            return []
+        ov = Overlay(i, sector, size, 0x80000000 | slot_dest, sizes_addr)
         buf = data[ov.start:ov.start + size]
         p = 0
         while True:

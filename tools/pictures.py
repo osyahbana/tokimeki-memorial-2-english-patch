@@ -41,6 +41,7 @@ import hashlib
 import re
 import struct
 import sys
+from functools import lru_cache
 
 import cdimage
 import compression as C
@@ -260,10 +261,27 @@ def export(chunk, w, out, vram=None, clut=None, bpp=4):
     im.save(out)
 
 
+@lru_cache(maxsize=32)
+def _compress_picture(kind, raw):
+    """Reuse identical translated textures across discs; verify each encoding."""
+    if kind == 'lz1':
+        import lz1enc
+        encoded = lz1enc.compress(raw)
+        decoded, _ = C.lz1(encoded, 0, limit=len(raw))
+    elif kind == 'lz2':
+        import lz2enc
+        encoded = lz2enc.compress(raw)
+        decoded, _ = C.lz2(encoded, 0, limit=len(raw))
+    else:
+        raise ValueError('unsupported picture compression: ' + kind)
+    if bytes(decoded) != raw:
+        raise ValueError('compressed picture failed round-trip validation')
+    return encoded
+
+
 def encode(chunk, png, w, bpp=4):
     """New payload bytes (compressed) for an edited PNG."""
     from PIL import Image
-    import lz1enc
     im = Image.open(png)
     if im.mode != "P":
         raise ValueError("%s: must be an indexed (palette) PNG; edit with palette indices kept" % png)
@@ -272,13 +290,7 @@ def encode(chunk, png, w, bpp=4):
     if px.shape != pixels(chunk, w, bpp).shape:
         raise ValueError("%s: size %s, expected %s" % (png, px.shape[::-1], pixels(chunk, w, bpp).shape[::-1]))
     raw = pack(px, bpp)
-    if chunk.kind == "lz1":
-        z = lz1enc.compress(raw)
-    elif chunk.kind == "lz2":
-        import lz2enc
-        z = lz2enc.compress(raw)
-    else:
-        raise ValueError("only lz1 and lz2 pictures can be re-imported so far (%s)" % chunk.kind)
+    z = _compress_picture(chunk.kind, bytes(raw))
     if len(z) > chunk.limit:
         raise ValueError("compressed picture is %d bytes, room for %d: simplify the edit" % (len(z), chunk.limit))
     return z
@@ -354,7 +366,19 @@ def _chunk_at(data, name):
     if name.startswith("r"):
         cs = [c for c in [record_at(data, p)] if c]
     elif name.startswith("s"):
-        cs = scan_streams(data, s, s + 1)
+        # An explicit location must be decoded directly. A plausible overlapping
+        # stream earlier in the sector can make the heuristic scanner skip it.
+        # apply_manifest still requires the decoded picture's content hash.
+        cs = []
+        if 0 <= p <= len(data) - 8 and p % 4 == 0:
+            try:
+                dec, n = C.lz1(data, p, limit=1 << 16)
+                if n > 0 and p + n <= len(data) and len(dec) >= 512 and len(dec) % 512 == 0:
+                    c = Chunk(s, o, "lz1", 0, 0, dec, n, n)
+                    c.stream = True
+                    cs = [c]
+            except (ValueError, IndexError, AssertionError):
+                pass
     else:
         cs = scan(data, p, p + 0x10000)
     for c in cs:

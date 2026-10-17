@@ -1,0 +1,45 @@
+{
+  "revision": "Japan original / v1.0",
+  "images": [
+    {
+      "disc": 1,
+      "size": 692445264,
+      "crc32": "2D0D0251",
+      "sha1": "150be982e204653768c6548ff1c2e1aa716fc1eb",
+      "sha256": "bedc4490baf93463788509441d0a8aaaa4b0ccbd05c7d2feb6b6f5103dcd5a1f",
+      "exe": "SLPM_863.55"
+    },
+    {
+      "disc": 2,
+      "size": 739478208,
+      "crc32": "5EEB5C5D",
+      "sha1": "764cc58a78a1311f1d26c50a4e3a98d80012da25",
+      "sha256": "4060a20ce456b7a741d16aff8cad29a855f5b9ba1d02bda3552be9b8e3911046",
+      "exe": "SLPM_863.56"
+    },
+    {
+      "disc": 3,
+      "size": 747698448,
+      "crc32": "F9D69805",
+      "sha1": "2fd1a708d5f5c4fc452d201fde543a21cedf4b5a",
+      "sha256": "10f8eb5265deb456945f37d5b2142ace22c7a6f189150c12a295a2129691ce46",
+      "exe": "SLPM_863.57"
+    },
+    {
+      "disc": 4,
+      "size": 744814896,
+      "crc32": "86E00E24",
+      "sha1": "10d5a49fafddb956e9a6f530c7ea67a2353795e3",
+      "sha256": "490183ded249c6dfa8f58dce591b7786c2dcb5919409c5cf71422037213bc9ff",
+      "exe": "SLPM_863.58"
+    },
+    {
+      "disc": 5,
+      "size": 742660464,
+      "crc32": "0906C4B9",
+      "sha1": "1c44dbdaff497e00ffa95e5fa38dd1e682119445",
+      "sha256": "d67389a0be2d392335b8d54eb11533cef09466f43d310f5054666e4872edf73c",
+      "exe": "SLPM_863.59"
+    }
+  ]
+}

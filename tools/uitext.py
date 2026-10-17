@@ -94,7 +94,7 @@ def modules(data, path):
     mods = [("EXE", lba * 2048 + 0x800, EXE_BASE, tsize)]
     mods.append(("ENGINE", ENGINE_SECTOR.get(name, 1559) * 2048, ENGINE_ADDR, ENGINE_SIZE))
     for ov in OV.find(data, exe):
-        mods.append(("OV%d" % ov.index, ov.start, OV.SLOT_ADDR, ov.size))
+        mods.append(("OV%d" % ov.index, ov.start, ov.slot_addr, ov.size))
     if name in NAME_MODULE:
         mods.append(("NAME",) + NAME_MODULE[name])
     if name in EVS_MODULE:
@@ -158,7 +158,13 @@ def scan(data, path):
         refs = _refs(D[:len(D) // 4 * 4], B)
         cand = list(_candidates(D, B, refs))
         if name == "EVS":
-            cand = [c for c in cand if any(lo <= B + c[0] < hi for lo, hi in EVS_TEXT)]
+            import evsgrid
+            rows, rows_end, _, _ = evsgrid.layout(D)
+            ranges = EVS_TEXT
+            if rows == evsgrid.ROWS - 0x18:
+                ranges = [(0x800C02E0, rows), (rows_end, 0x800C0B00),
+                          (0x800C1724, 0x800C1D40), (0x800E69C4, 0x800E69D4)]
+            cand = [c for c in cand if any(lo <= B + c[0] < hi for lo, hi in ranges)]
         if name == "CHILD":
             cand = [c for c in cand if any(lo <= B + c[0] < hi for lo, hi in CHILD_TEXT)]
         if name == "NAME":

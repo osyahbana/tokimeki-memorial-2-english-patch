@@ -28,6 +28,22 @@ BLOCKS = [
      "陽ノ下 水無月 寿 一文字 白雪 赤井 八重 佐倉 伊集院 麻生 坂城 穂刈".split()),
 ]
 NONE = "{none}"
+ORIGINAL_SHIFTS = {"ENGINE": -0x20, "EXE": -0x6C, "OV1": 0x10}
+
+
+def resolve_block(M, B, block):
+    """Select a known revision only when the entire ordered string list matches."""
+    mod, lo, hi, expect = block
+    matches = []
+    for shift in (0, ORIGINAL_SHIFTS.get(mod, 0)):
+        candidate = (mod, lo + shift, hi + shift, expect)
+        try:
+            texts = [s.decode('cp932') for _, s in _strings(M, B, lo + shift, hi + shift)]
+        except (ValueError, IndexError, UnicodeError):
+            continue
+        if texts == expect and candidate not in matches:
+            matches.append(candidate)
+    return matches[0] if len(matches) == 1 else block
 
 
 def _strings(M, B, lo, hi):
@@ -68,7 +84,7 @@ def plan(M, B, block, en):
     S = _strings(M, B, lo, hi)
     texts = [s.decode("cp932", "replace") for _, s in S]
     if texts != expect:
-        return "strings differ (%s)" % " ".join(texts[:4])
+        return "strings differ (%s)" % repr(" ".join(texts[:4])[:80])
     ptrs, code = _refs(M, B, lo, hi)
     starts = {a for a, _ in S}
 
@@ -119,8 +135,24 @@ def plan(M, B, block, en):
     return new, fixes
 
 
-def covers(module, addr):
-    return any(m == module and lo <= addr < hi for m, lo, hi, _ in BLOCKS)
+def resolved_blocks(data, path):
+    import uitext
+    mods = {name: (off, B, size) for name, off, B, size in uitext.modules(data, path)}
+    out = []
+    for block in BLOCKS:
+        if block[0] not in mods:
+            continue
+        off, B, size = mods[block[0]]
+        M = data[off:off + size]
+        candidate = resolve_block(M, B, block)
+        if not isinstance(plan(M, B, candidate, lambda ja: None), str):
+            out.append(candidate)
+    return out
+
+
+def covers(module, addr, blocks=None):
+    return any(m == module and lo <= addr < hi
+               for m, lo, hi, _ in (BLOCKS if blocks is None else blocks))
 
 
 def apply(data, path, ui, pre):
@@ -141,6 +173,8 @@ def apply(data, path, ui, pre):
             continue
         off, B, size = mods[mod]
         M = data[off:off + size]
+        block = resolve_block(M, B, block)
+        mod, lo, hi, _ = block
         r = plan(M, B, block, en)
         if isinstance(r, str):
             notes.append("%s %#x: left alone, %s" % (mod, lo, r))

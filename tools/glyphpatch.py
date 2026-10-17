@@ -13,7 +13,8 @@ letter-pair codes (tools/font_en.py) and builds their cell bitmap from the
 English font into a 32-byte buffer inside the block.
 
 The block was found and measured in docs/game-internals.md section 9. The
-five discs' EXEs are identical here, so one patch fits all of them.
+five discs' EXEs are identical here within each supported revision. Exact
+block hashes select Japan original or Rev 1 font and BIOS addresses.
 
 Assembling needs keystone (pip install keystone-engine).
 """
@@ -35,6 +36,31 @@ CUSTOM_CODES = [
     0x997A, 0xE785, 0x9DF3, 0xE056, 0x9EBC, 0xE05F, 0x99E7, 0xE0D1, 0xE97D, 0xE1BF,
 ]
 ORIGINAL_SHA1 = "1681a326cf5ac85792b9404a03dbf45b4b683796"   # of the original block
+
+# Exact measured block identities. Japan v1.0 has the same entry points,
+# instructions and custom-code ordering; only the font/BIOS addresses differ.
+# Relocating its 31 font immediates and single BIOS jal by +0x6C reproduces
+# the Rev 1 block's exact SHA1, independently confirming that equivalence.
+# Keeping revision data explicit prevents applying Rev 1 pointers to v1.0.
+REVISIONS = {
+    "rev1": dict(block_sha1=ORIGINAL_SHA1, custom_base=CUSTOM_BASE,
+                 krom2rawadd=KROM2RAWADD, renderer_b_scratch=0x800A1FB0),
+    "original": dict(block_sha1="af30bdcb864accac4d75cfb2e0d759f8494193cf",
+                     custom_base=0x80061808, krom2rawadd=0x8005A498,
+                     renderer_b_scratch=0x800A1F48),
+}
+
+
+def detect_revision(exe):
+    """Identify a supported, unpatched glyph block; reject every other block."""
+    if exe[:8] != b"PS-X EXE" or struct.unpack_from("<I", exe, 0x18)[0] != EXE_BASE:
+        raise ValueError("unexpected PS-X executable header or load address")
+    o = 0x800 + BLOCK_LO - EXE_BASE
+    digest = hashlib.sha1(exe[o:o + BLOCK_HI - BLOCK_LO]).hexdigest()
+    for name, revision in REVISIONS.items():
+        if digest == revision["block_sha1"]:
+            return name
+    raise ValueError("glyph block differs from supported originals (already patched?)")
 
 
 def _hilo(addr):
@@ -94,7 +120,7 @@ def layout():
     return dict(codes=codes, nib=nib, buf=buf, font=font, data_end=a)
 
 
-def source(L, lk_body=RENDER_A):
+def source(L, lk_body=RENDER_A, revision="rev1"):
     """Assembly for the code at RENDER_A (renderer A, then the lookup)."""
     W, H, top = font_en.W, font_en.H, font_en.CELL_TOP
     assert font_en.LEFT_X + W <= 8 and font_en.RIGHT_X >= 8 and font_en.RIGHT_X + W <= 16
@@ -109,8 +135,9 @@ def source(L, lk_body=RENDER_A):
     ind = lambda lines: "".join("    " + l + "\n" for l in lines)
     hi_b, lo_b = _hilo(L["buf"])
     hi_c, lo_c = _hilo(L["codes"])
-    hi_g, lo_g = _hilo(CUSTOM_BASE)
-    hi_f, lo_f = _hilo(CUSTOM_BASE + 30 * 30)
+    rev = REVISIONS[revision]
+    hi_g, lo_g = _hilo(rev["custom_base"])
+    hi_f, lo_f = _hilo(rev["custom_base"] + 30 * 30)
     return f"""
 .set noreorder
 # ---------------- renderer A (0x8001C874): a0 = 2-byte char, a1 = out (128 B)
@@ -130,7 +157,7 @@ render_a:
     move  $s0, $v1
     bnez  $v0, ra_have
     move  $a2, $v0
-    jal   {KROM2RAWADD:#x}        # BIOS font
+    jal   {rev["krom2rawadd"]:#x}        # BIOS font
     move  $a0, $s0
     move  $a2, $v0
 ra_have:
@@ -283,14 +310,14 @@ def _count_instructions(src):
     return n
 
 
-def build():
+def build(revision="rev1"):
     """Return (block bytes for BLOCK_LO..BLOCK_HI, symbol dict)."""
     L = layout()
     # pass 1 finds lk_body (keystone turns "jal label" into a PIC call, so
     # jal targets are given as numbers)
-    head = source(L).split("\nlk_body:")[0]
+    head = source(L, revision=revision).split("\nlk_body:")[0]
     lk_body = RENDER_A + len(_asm(head, RENDER_A))
-    src = source(L, lk_body)
+    src = source(L, lk_body, revision=revision)
     code = _asm(src, RENDER_A)
     # keystone must not have added or dropped instructions (delay slots)
     assert len(code) == 4 * _count_instructions(src), (len(code), _count_instructions(src))
@@ -316,10 +343,8 @@ def build():
 def patch_exe(exe):
     """exe: bytes of SLPM_863.5x (any disc). Returns the patched EXE."""
     o = 0x800 + BLOCK_LO - EXE_BASE
-    old = exe[o:o + BLOCK_HI - BLOCK_LO]
-    if hashlib.sha1(old).hexdigest() != ORIGINAL_SHA1:
-        raise ValueError("glyph block differs from the original game (already patched?)")
-    blk, _ = build()
+    revision = detect_revision(exe)
+    blk, _ = build(revision)
     return exe[:o] + blk + exe[o + len(blk):]
 
 

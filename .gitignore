@@ -19,3 +19,27 @@ __pycache__/
 
 # xdelta patches for releases (tools/make_xdelta.py) - upload them, don't commit them
 patches/
+
+# Local builds, runtimes, saves and packaging artifacts
+.tm2-build-*/
+.tm2-set-*/
+.venv/
+venv/
+build/
+dist/
+*.pbp
+*.ecm
+*.mdf
+*.mds
+*.exe
+*.dll
+*.elf
+*.sav
+*.mcd
+*.mcr
+*.state
+*.zip
+*.7z
+*.pyc
+*.log
+.env.*

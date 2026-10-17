@@ -13,7 +13,8 @@
   "width": 64,
   "bpp": 4,
   "at": [
-   "73751:1416"
+   "73751:1416",
+   "73750:1416"
   ],
   "what": "Disc 1, a second copy of the same buttons in a packet (used elsewhere)"
  },
@@ -59,7 +60,8 @@
   "bpp": 4,
   "at": [
    "s841:464",
-   "s966:152"
+   "s966:152",
+   "s1004:152"
   ],
   "what": "File-select parts: slot numbers, YES / NO, SLOT:1/2 and the セーブ button (SAVE). Disc 2 streams s841:464 and s966:152, VRAM (512,0)"
  },

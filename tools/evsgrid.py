@@ -73,6 +73,25 @@ def label(ch):
     return font_en.pair_code(r[0], r[1] if len(r) > 1 else " ")
 
 
+def layout(mod):
+    """Guarded (rows, rows_end, table, reads) for Rev 1 or original Japan."""
+    variants = [(ROWS, ROWS_END, TABLE, READS),
+                (ROWS - 0x18, ROWS_END - 0x18, TABLE + 0x108,
+                 {a + 0xC4: w for a, w in READS.items()})]
+    matches = []
+    for rows, end, table, reads in variants:
+        if len(mod) < table - BASE + STRIDE * N_ROWS:
+            continue
+        if not all(struct.unpack_from('<I', mod, a - BASE)[0] == w for a, w in reads.items()):
+            continue
+        ptrs = [struct.unpack_from('<I', mod, table - BASE + STRIDE*k)[0] for k in range(N_ROWS)]
+        if len(set(ptrs)) == N_ROWS and all(rows <= p < end for p in ptrs):
+            matches.append((rows, end, table, reads))
+    if len(matches) != 1:
+        raise ValueError('unrecognized EVS grid layout')
+    return matches[0]
+
+
 def patch_module(mod):
     m = bytearray(mod)
 
@@ -81,12 +100,14 @@ def patch_module(mod):
 
     if not at(DEV_PATHS, 16).startswith(b"\\t2\\data\\battle"):
         raise ValueError("not the EVS module (developer paths)")
-    for a, w in READS.items():
+    rows_addr, rows_end, table_addr, reads = layout(mod)
+    delta = rows_addr - COPY
+    for a, w in reads.items():
         if struct.unpack("<I", at(a))[0] != w:
             raise ValueError("not the EVS module (word at %#x)" % a)
-    rows = at(ROWS, ROWS_END - ROWS)
-    ptrs = [struct.unpack_from("<I", m, TABLE - BASE + STRIDE * k)[0] for k in range(N_ROWS)]
-    if sorted(ptrs) != sorted(set(ptrs)) or not all(ROWS <= p < ROWS_END for p in ptrs):
+    rows = at(rows_addr, rows_end - rows_addr)
+    ptrs = [struct.unpack_from("<I", m, table_addr - BASE + STRIDE * k)[0] for k in range(N_ROWS)]
+    if sorted(ptrs) != sorted(set(ptrs)) or not all(rows_addr <= p < rows_end for p in ptrs):
         raise ValueError("unexpected row table")
     copy = bytearray(rows)
     i = 0
@@ -100,9 +121,9 @@ def patch_module(mod):
     assert COPY + len(copy) <= DEV_PATHS_END
     m[COPY - BASE:COPY - BASE + len(copy)] = copy
     for k, p in enumerate(ptrs):
-        struct.pack_into("<I", m, TABLE - BASE + STRIDE * k, p - DELTA)
-    for a, w in READS.items():
-        struct.pack_into("<I", m, a - BASE, (w & 0xFFFF0000) | ((w + DELTA) & 0xFFFF))
+        struct.pack_into("<I", m, table_addr - BASE + STRIDE * k, p - delta)
+    for a, w in reads.items():
+        struct.pack_into("<I", m, a - BASE, (w & 0xFFFF0000) | ((w + delta) & 0xFFFF))
     return bytes(m)
 
 

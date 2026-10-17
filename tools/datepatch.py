@@ -58,8 +58,11 @@ def find(data):
     ok, skipped = [], []
     p = data.find(ORIG)
     while p >= 0:
-        c = p - CODE_BACK
-        if c >= 0 and data[c:c + 4] == CODE_ORIG and data[c + DAY_AT:c + DAY_AT + 4] == DAY_ORIG:
+        matches = [p - back for back in (CODE_BACK, CODE_BACK - 0x10)
+                   if p >= back and data[p-back:p-back+4] == CODE_ORIG
+                   and data[p-back+DAY_AT:p-back+DAY_AT+4] == DAY_ORIG]
+        if len(matches) == 1:
+            c = matches[0]
             ok.append((p, c))
         else:
             skipped.append(p)

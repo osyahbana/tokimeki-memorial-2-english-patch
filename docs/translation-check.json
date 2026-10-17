@@ -1,0 +1,16 @@
+{
+  "translated": 169995,
+  "strings": 169995,
+  "issues": [
+    {
+      "level": "WARN",
+      "where": "DEFAULT-4bc5b52c/164+187+214+237+260+287+310+333+356+381+404+417",
+      "msg": "row is 25 cells (holds 20): the game wraps it"
+    },
+    {
+      "level": "WARN",
+      "where": "G_BOMB-a1d9e649/887+912+925+938+951+964+977+990+1003+1016+1029+1045+1067",
+      "msg": "row is 60 cells (holds 20): the game wraps it"
+    }
+  ]
+}
