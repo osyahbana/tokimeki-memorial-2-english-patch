@@ -5,6 +5,35 @@ discs, with correct English presentation, game state, resource selection and sav
 The port is incomplete. None of the later milestones is claimed by the current
 research executable.
 
+## Required final deliverable
+
+The release target is a Windows application launched by double-clicking
+`Tokimeki2.exe`. After a one-time local import of the user's five discs, normal
+play requires no emulator launch, disc mounting or manual disc selection.
+An executable alongside its imported data folder is sufficient; embedding all
+game assets inside a single executable is not required.
+
+- Game logic and executable overlays run as compiled native PC code. Shipping a
+  MIPS interpreter, CPU JIT or silent interpreter fallback does not meet the
+  target. A native host executable alone does not establish native game execution.
+- Rendering, audio, input, timing, storage and media playback use PC backends.
+  Any retained PlayStation hardware compatibility layer must be documented;
+  eliminating CPU fallback alone does not establish that all hardware emulation
+  has been removed. No external emulator or user-supplied console BIOS is part
+  of normal play.
+- The application selects the correct imported resources from all five discs,
+  including transitions and loading saves from later portions of the game.
+- English dialogue and interface, opening/childhood sequence, simulation,
+  choices, routes, minigames, movies, sound and persistent saves work together.
+- Release validation includes complete playthroughs, disc-boundary scenarios
+  and execution with CPU fallback unavailable. Unknown code must fail visibly
+  during development rather than silently entering an interpreter.
+
+The current PSXRecomp build is an intermediate compatibility and behavior probe.
+It still interprets substantial game code and models PlayStation hardware, so
+it does not satisfy this deliverable. Use it to recover and validate behavior
+while compiling overlays and implementing the required native PC services.
+
 The [PSXRecomp assessment](recomp/README.md) establishes a second route that can
 retain the original gameplay logic through static recompilation. Prioritize a
 Disc 1 runtime validation, then overlay coverage and the five-disc program

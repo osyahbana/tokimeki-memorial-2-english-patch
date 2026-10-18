@@ -4,6 +4,11 @@ This `native-port` branch contains an early C#/.NET engine reimplementation.
 **It is not a playable full-game port yet.** See [native engine instructions](native/README.md)
 for the executable, importer, tests, evidence and remaining work.
 
+The [required final deliverable](native/ROADMAP.md#required-final-deliverable) is
+a double-clickable `Tokimeki2.exe` with locally imported game data, native game
+and overlay execution, PC backends, and automatic access to all five discs.
+The current prototype does not meet that requirement.
+
 The [static recompilation experiment](native/recomp/README.md) now builds a
 Windows executable that renders Disc 1's opening movie. A CD-controller seek
 status fix removes the initial black-screen stall. Significant game code still
