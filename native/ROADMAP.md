@@ -5,6 +5,12 @@ discs, with correct English presentation, game state, resource selection and sav
 The port is incomplete. None of the later milestones is claimed by the current
 research executable.
 
+The [PSXRecomp assessment](recomp/README.md) establishes a second route that can
+retain the original gameplay logic through static recompilation. Prioritize a
+Disc 1 runtime boot experiment, then overlay coverage and the five-disc program
+differences. The milestones below describe the existing C# reconstruction;
+they are not prerequisites for that separate recompilation experiment.
+
 | Milestone | Required evidence and acceptance check | Current state |
 |---|---|---|
 | Content import | Hash-qualified sources; valid decoded branches; retain disc and instance identity | Implemented for documented images; global reachability unresolved |
@@ -25,8 +31,9 @@ research executable.
 2. Separate observed behavior, inferred interpretation and unknown behavior.
 3. Never silently skip an unknown opcode, invent state query values, or describe
    an address-sorted dialogue viewer as a running game.
-4. Use the original CPU routines only for offline differential tests. Runtime
-   code must implement the recovered behavior itself.
+4. In the C# reconstruction, use original CPU routines only for offline
+   differential tests. In the recompilation route, measure native translation
+   and fallback coverage separately; do not present fallback as native execution.
 5. Import user-supplied assets locally. Commit source, synthetic tests and research
    findings; keep extracted copyrighted content and original code bytes out of Git.
 6. Preserve each resource's disc/revision and locator even when deduplicating

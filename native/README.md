@@ -6,6 +6,10 @@ application with its own script interpreter. It does not launch DuckStation,
 execute MIPS instructions, load a PlayStation BIOS, or embed a console emulator.
 The .NET runtime is included in the self-contained Windows build.
 
+See the [static recompilation assessment](recomp/README.md) for the newly tested
+PSXRecomp path. It is separate from this C# research application and is now the
+recommended next gameplay experiment.
+
 ## What exists
 
 - A read-only importer for the five documented original or English-patched BINs.
