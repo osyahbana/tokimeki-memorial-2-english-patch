@@ -1,0 +1,26 @@
+diff --git a/runtime/src/main.cpp b/runtime/src/main.cpp
+index a4e2347..1e5a025 100644
+--- a/runtime/src/main.cpp
++++ b/runtime/src/main.cpp
+@@ -19766,6 +19766,11 @@ int main(int argc, char** argv) {
+      * renderer and window creation only after session_reboot, so activation
+      * precedes them either way. A netplay clear leaves no plan, so nothing
+      * activates and the session stays vanilla. */
++    /* Keep this compile-time check outside the capturing lambda: MSVC 19.39
++     * otherwise treats the captured constexpr values as reads through this. */
++    static_assert(!frame_interpolation_offered && !skip_fmv_offered,
++                  "reset_mod_owned_presentation() would clobber a launcher "
++                  "setting; restore only when the feature is mod-owned");
+     auto start_mod_session = [&](bool netplay) {
+         /* Clear game-owned controller overrides/policies and load/disc-speed
+          * choices first so disabling a package cannot leave its prior state
+@@ -19792,9 +19797,6 @@ int main(int argc, char** argv) {
+         /* The helper restores interpolation and Skip FMVs to their
+          * pre-activation values, which is only right while no launcher
+          * control owns them. */
+-        static_assert(!frame_interpolation_offered && !skip_fmv_offered,
+-                      "reset_mod_owned_presentation() would clobber a launcher "
+-                      "setting; restore only when the feature is mod-owned");
+         reset_mod_owned_presentation();
+         /* Netplay own-view mods: the widescreen margin follows them into the
+          * sandboxed own view only; the shared game keeps the stock cull. */

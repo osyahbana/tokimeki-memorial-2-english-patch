@@ -1,0 +1,65 @@
+{
+  "date": "2026-10-18",
+  "scope": "Disc 1 opening-movie smoke test; not a gameplay or fully-native coverage pass",
+  "framework_revision": "53a057f548cd1f93f1b4d8300caaeded72f4160d",
+  "framework_patches": [
+    "0001-msvc-lambda-static-assert.patch",
+    "0002-portable-render-atomics.patch",
+    "0003-explicit-seek-finishes-idle.patch"
+  ],
+  "platform": "Windows x64, MSVC 19.39, Release",
+  "runtime_sha256": "a44ddab3f85dcffffc7785aaf27e8f720d90782953c81e74c83c5488f781ead3",
+  "disc": {
+    "serial": "SLPM-86355",
+    "variant": "English-patched original Japan / v1.0",
+    "sha256": "c7fed091a4d9137e7130b8ffec036c9fa1eccc037c50e2d36dd27bf67c60c819"
+  },
+  "configuration": {
+    "renderer": "software",
+    "headless": true,
+    "execution_profile": "REFERENCE",
+    "bios": "bundled OpenBIOS",
+    "bios_sha256": "fabe498fbf224e4721f12f31b6f5fe0659205e341dc4e5c5f91b9bd1a1011c57",
+    "hle_boot_and_scheduler": "framework defaults",
+    "force_interpreter": false,
+    "native_overlay_cache": false,
+    "save_isolation": "fresh per-run directory"
+  },
+  "checks": {
+    "runtime_link": "passed",
+    "cd_fifo_fixture": "passed",
+    "explicit_seek_regression_before_fix": "failed",
+    "explicit_seek_regression_after_fix": "passed",
+    "opening_movie_rendered": true,
+    "baseline_stall_reproduced_without_hle_scheduler": true,
+    "baseline_stall_reproduced_with_forced_interpreter": true,
+    "title_menu_input": "not established",
+    "complete_playable_scene": "not established",
+    "audio": "not evaluated",
+    "duckstation_behavioral_comparison": "not completed",
+    "automatic_disc_changes": "not implemented"
+  },
+  "fixed_45_second_probe": {
+    "last_sample_frame": 5125,
+    "last_cd_sector": 281721,
+    "interpreted_instructions": 118666453,
+    "interpreted_blocks": 449409,
+    "native_handoffs": 74361,
+    "interpreter_aborts": 0,
+    "guard_yields": 29,
+    "text_native_blocked": 8,
+    "text_diverged_pages": 1,
+    "text_exact_mismatches": 7,
+    "coverage_note": "Counters are not comparable denominators; no native percentage is inferred."
+  },
+  "followup_180_second_probe": {
+    "process_alive_before_cleanup": true,
+    "last_sample_frame": 20119,
+    "interpreted_instructions": 688832712,
+    "native_handoffs": 308222,
+    "interpreter_aborts": 0,
+    "observed": "Opening movie followed by black captures; recent CD reads continued. Menu response and permanent stall are both unestablished.",
+    "input": "Manually timed Start 0xFFF7 and Circle 0xDFFF injections; server accepted commands, game response unverified."
+  },
+  "private_evidence": "Full logs, register traces, generated game C, screenshots and game assets are excluded from this repository."
+}

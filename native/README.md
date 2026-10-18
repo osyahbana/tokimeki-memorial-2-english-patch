@@ -8,7 +8,9 @@ The .NET runtime is included in the self-contained Windows build.
 
 See the [static recompilation assessment](recomp/README.md) for the newly tested
 PSXRecomp path. It is separate from this C# research application and is now the
-recommended next gameplay experiment.
+recommended gameplay experiment. It now links and renders the opening movie,
+with substantial interpreter fallback; see its separate build and validation
+instructions. This does not change the C# client's execution boundary below.
 
 ## What exists
 

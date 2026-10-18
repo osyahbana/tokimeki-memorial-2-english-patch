@@ -6,7 +6,15 @@
   Its source uses **PolyForm Noncommercial License 1.0.0**; see the
   [upstream license](https://github.com/RetroPortingToolKit/psxrecomp/blob/53a057f548cd1f93f1b4d8300caaeded72f4160d/LICENSE).
   It is an external dependency, not relicensed by this project. The probe helper
-  invokes its separately checked-out Python probe; no framework source is vendored.
+  invokes its separately checked-out Python probe. The small modifications in
+  [framework-patches](framework-patches) contain framework source/context and
+  retain its [PolyForm Noncommercial license](framework-patches/LICENSE) and
+  copyright attribution: Copyright 2026 Matthew Stanley. Runtime regression
+  tests compile the separately checked-out framework fixture.
+- **OpenBIOS**, the PSXRecomp-bundled BIOS implementation: built from the pinned
+  framework's `bios/OpenBIOS.toml`. The private runtime uses the bundled binary
+  and generated implementation. Preserve the staged `OpenBIOS.LICENSE` with
+  local builds. No retail PlayStation BIOS is required by this experiment.
 - **psxdecomp**, anzaldoivan:
   https://github.com/anzaldoivan/psxdecomp
   Evaluated at `cd1d02fd088d571368001f8fff74b12a34498233`.

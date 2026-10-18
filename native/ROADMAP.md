@@ -7,8 +7,10 @@ research executable.
 
 The [PSXRecomp assessment](recomp/README.md) establishes a second route that can
 retain the original gameplay logic through static recompilation. Prioritize a
-Disc 1 runtime boot experiment, then overlay coverage and the five-disc program
-differences. The milestones below describe the existing C# reconstruction;
+Disc 1 runtime validation, then overlay coverage and the five-disc program
+differences. The runtime links and renders the opening movie after a CD seek
+status correction; substantial interpreter fallback remains. The milestones
+below describe the existing C# reconstruction;
 they are not prerequisites for that separate recompilation experiment.
 
 | Milestone | Required evidence and acceptance check | Current state |

@@ -4,10 +4,11 @@ This `native-port` branch contains an early C#/.NET engine reimplementation.
 **It is not a playable full-game port yet.** See [native engine instructions](native/README.md)
 for the executable, importer, tests, evidence and remaining work.
 
-The [static recompilation assessment](native/recomp/README.md) now recommends
-PSXRecomp as the next gameplay experiment. Disc 1 code generation and Windows
-object compilation passed; runtime boot, overlays and automatic disc changes
-remain unverified. The existing C# client remains useful for research.
+The [static recompilation experiment](native/recomp/README.md) now builds a
+Windows executable that renders Disc 1's opening movie. A CD-controller seek
+status fix removes the initial black-screen stall. Significant game code still
+uses interpreter fallback; full gameplay and automatic disc changes are not
+implemented or validated. The existing C# client remains useful for research.
 
 The playable English patch remains on the fork's `improvements` branch. Its source
 and documentation are retained below because the native importer reuses its

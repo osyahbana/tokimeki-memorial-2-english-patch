@@ -1,0 +1,21 @@
+diff --git a/runtime/src/cdrom.c b/runtime/src/cdrom.c
+index d667ba3..238a1d8 100644
+--- a/runtime/src/cdrom.c
++++ b/runtime/src/cdrom.c
+@@ -2445,3 +2445,3 @@ static void exec_command(uint8_t cmd) {
+         read_sect = seek_sect;
+-        stat_reg |= CDSTAT_SEEK;
++        stat_reg = (stat_reg & ~(CDSTAT_READ | CDSTAT_PLAY)) | CDSTAT_SEEK;
+         response_push(stat_reg);
+@@ -2587,6 +2587,8 @@ static void process_pending(uint32_t cycles) {
+     case 0x16: /* SeekP complete */
+-        stat_reg &= ~CDSTAT_SEEK;
+-        stat_reg |= CDSTAT_READ;   /* PSX-CD-003: GT1 waits for READ after seek */
++        /* Explicit seeks finish paused. Only a subsequent ReadN/ReadS sets
++         * READ; treating an explicit seek like a read's implicit seek leaves
++         * Tokimeki Memorial 2 polling Getstat forever with no active stream. */
++        stat_reg &= ~(CDSTAT_SEEK | CDSTAT_READ | CDSTAT_PLAY);
+         setloc_seek_far = 0;
+-    setloc_pending = 0;
++        setloc_pending = 0;
+         response_push(stat_reg);
