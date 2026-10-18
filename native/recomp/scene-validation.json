@@ -1,0 +1,126 @@
+{
+  "date": "2026-10-18",
+  "framework_revision": "53a057f548cd1f93f1b4d8300caaeded72f4160d",
+  "framework_patches": [
+    1,
+    2,
+    3
+  ],
+  "source_disc": "English-patched Disc 1 as identified in runtime-validation.json",
+  "renderer": "software",
+  "runtime_compilation": "disabled",
+  "native_only_release": false,
+  "generation": {
+    "distinct_images": 46,
+    "added_discovery_roots": 2001,
+    "translation_units": 59,
+    "guarded_function_identities_including_continuation_wrappers": 28024,
+    "isolated_interior_fragments": 26,
+    "reported_failures": 0,
+    "reported_skips": 0,
+    "runtime_link": "passed"
+  },
+  "map_checkpoint_comparison": {
+    "initial_15_image_build": {
+      "runtime_sha256": "edd20f6233b1088c2a69674df0b81f62885edda5d7b9bf64b77e3fd02e3910f3",
+      "frame_target_reached": true,
+      "exit_code": 0,
+      "last_sample_frame": 1013,
+      "dirty_ram_interpreter_instructions": 36389780,
+      "static_overlay_hits": 0,
+      "interpreter_aborts": 0,
+      "checkpoint_sha256": "8e0e959c3eafc0c6bf9e4b4fa55c8e5380c16e599d96b158e0f01c4abb6b53b4",
+      "checkpoint_load_confirmed": true,
+      "baseline_frame": 324,
+      "sampled_frames_after_load": 689,
+      "additional_dirty_ram_interpreter_instructions": 31684584,
+      "additional_static_overlay_hits": 0
+    },
+    "expanded_46_image_build": {
+      "runtime_sha256": "2f860288c544ee7a88477eb5ca413879cdc5d396d1461f5c9f838ea731f79577",
+      "frame_target_reached": true,
+      "exit_code": 0,
+      "last_sample_frame": 847,
+      "dirty_ram_interpreter_instructions": 0,
+      "static_overlay_hits": 502361,
+      "interpreter_aborts": 0,
+      "checkpoint_sha256": "8e0e959c3eafc0c6bf9e4b4fa55c8e5380c16e599d96b158e0f01c4abb6b53b4",
+      "checkpoint_load_confirmed": true,
+      "baseline_frame": 161,
+      "sampled_frames_after_load": 686,
+      "additional_dirty_ram_interpreter_instructions": 0,
+      "additional_static_overlay_hits": 425532
+    },
+    "visual_result": "Both render the neighborhood map; asynchronous samples, no pixel-parity claim."
+  },
+  "interactive_41_image_build": {
+    "runtime_sha256": "5290b49ecbbcfc49dbcbe38fd247d8847ff5511d19dc68a10e2c350b5f7a2bfd",
+    "frame_target_reached": true,
+    "exit_code": 0,
+    "last_sample_frame": 24180,
+    "dirty_ram_interpreter_instructions": 2779625,
+    "static_overlay_hits": 10761516,
+    "interpreter_aborts": 0,
+    "checkpoint_sha256": "467def8d0c317e25dbbf38b8a88ec25f7d64e56bd6b9a359071efa7948ac2665",
+    "checkpoint_load_confirmed": true,
+    "baseline_frame": 165,
+    "sampled_frames_after_load": 24015,
+    "additional_dirty_ram_interpreter_instructions": 2738822,
+    "additional_static_overlay_hits": 10715836
+  },
+  "expanded_classroom_checkpoint": {
+    "runtime_sha256": "2f860288c544ee7a88477eb5ca413879cdc5d396d1461f5c9f838ea731f79577",
+    "frame_target_reached": true,
+    "exit_code": 0,
+    "last_sample_frame": 799,
+    "dirty_ram_interpreter_instructions": 3910,
+    "static_overlay_hits": 248424,
+    "interpreter_aborts": 0,
+    "checkpoint_sha256": "467def8d0c317e25dbbf38b8a88ec25f7d64e56bd6b9a359071efa7948ac2665",
+    "checkpoint_load_confirmed": true,
+    "baseline_frame": 157,
+    "sampled_frames_after_load": 642,
+    "additional_dirty_ram_interpreter_instructions": 3240,
+    "additional_static_overlay_hits": 205650
+  },
+  "expanded_opening_boot": {
+    "runtime_sha256": "2f860288c544ee7a88477eb5ca413879cdc5d396d1461f5c9f838ea731f79577",
+    "frame_target_reached": true,
+    "exit_code": 0,
+    "last_sample_frame": 6063,
+    "dirty_ram_interpreter_instructions": 39147070,
+    "static_overlay_hits": 1816080,
+    "interpreter_aborts": 0
+  },
+  "expanded_map_input": {
+    "runtime_sha256": "2f860288c544ee7a88477eb5ca413879cdc5d396d1461f5c9f838ea731f79577",
+    "frame_target_reached": true,
+    "exit_code": 0,
+    "last_sample_frame": 3217,
+    "dirty_ram_interpreter_instructions": 0,
+    "static_overlay_hits": 1944278,
+    "interpreter_aborts": 0,
+    "checkpoint_sha256": "8e0e959c3eafc0c6bf9e4b4fa55c8e5380c16e599d96b158e0f01c4abb6b53b4",
+    "checkpoint_load_confirmed": true,
+    "baseline_frame": 157,
+    "sampled_frames_after_load": 3060,
+    "additional_dirty_ram_interpreter_instructions": 0,
+    "additional_static_overlay_hits": 1863817
+  },
+  "verified_visual_input_sequence": [
+    "Classroom dialogue",
+    "Street encounter with character/background changes",
+    "Return home",
+    "English map controls",
+    "Player movement on neighborhood map"
+  ],
+  "unverified": [
+    "Audiovisual parity with DuckStation",
+    "Normal memory-card save/load",
+    "Complete routes, choices and minigames",
+    "Disc transitions",
+    "Native-only full-game execution",
+    "Removal of PlayStation hardware compatibility services"
+  ],
+  "limits": "Counters measure dirty-RAM fallback and static overlay dispatch, not a shared coverage denominator. Checkpoint probes exclude startup before their baseline. Captures, checkpoints and generated game code remain private."
+}

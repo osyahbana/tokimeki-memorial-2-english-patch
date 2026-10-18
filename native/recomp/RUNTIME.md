@@ -118,8 +118,9 @@ The input timing was manual, so this run is diagnostic evidence rather than a
 repeatable controller test. Sanitized build and probe results are retained in
 [runtime-validation.json](runtime-validation.json).
 
-Next: verify title input and a complete scene, compare behavior against
-DuckStation, then compile hash-qualified overlays and resolve the five-disc
+Follow-up: the [overlay](OVERLAYS.md) and [childhood scene](SCENES.md) checks
+establish title input, dialogue transitions and map movement. Compare behavior
+against DuckStation and resolve the five-disc
 executable differences. Do not bypass the multi-program guard. Automatic disc
 selection still needs evidence of this game's request and acknowledgement
 protocol. No five-disc native runtime is claimed.

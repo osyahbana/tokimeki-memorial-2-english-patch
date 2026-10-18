@@ -37,9 +37,10 @@ while compiling overlays and implementing the required native PC services.
 The [PSXRecomp assessment](recomp/README.md) establishes a second route that can
 retain the original gameplay logic through static recompilation. Prioritize a
 Disc 1 runtime validation, then overlay coverage and the five-disc program
-differences. The runtime links, executes an initial static overlay batch, and
-reaches the English new-game/name-entry interface after a CD seek status
-correction. Substantial interpreter fallback remains. The milestones
+differences. The runtime links and executes compiled childhood overlays through
+classroom/street dialogue and map input, documented in the
+[scene checks](recomp/SCENES.md). A bounded map checkpoint records zero dirty-RAM
+interpreter instructions; startup and broader coverage still need work. The milestones
 below describe the existing C# reconstruction;
 they are not prerequisites for that separate recompilation experiment.
 

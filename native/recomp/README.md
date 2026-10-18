@@ -1,8 +1,8 @@
 # Static recompilation experiment
 
 Tested on 2026-10-18 against the five English-patched original-release images.
-**Disc 1 now executes an initial batch of compiled overlays and reaches the
-English new-game/name-entry interface using PSXRecomp.**
+**Disc 1 now executes compiled overlays through the childhood introduction,
+including English dialogue and neighborhood map interaction using PSXRecomp.**
 Keep the C# client as a format/behavior research tool. Neither route currently
 provides a playable native Tokimeki Memorial 2 build.
 
@@ -66,6 +66,11 @@ investigation stages without depending on Claude-specific agents or hooks.
   instructions fall from 187,707,287 to 40,105,619 in comparable bounded runs.
   A separate input run reaches File Select, the new-game confirmation and English
   name entry. This establishes menu interaction, not a complete playable scene.
+- The later [childhood scene checks](SCENES.md) extend this to classroom and
+  street dialogue, character/background changes, the return home and map input.
+  A 46-image batch records zero dirty-RAM interpreter instructions during a
+  bounded map checkpoint. This result is specific to that interval; startup,
+  other scenes, normal saves, audio and later discs remain separate obligations.
 
 The probe emits a generic one-track warning. It is not evidence that these
 particular discs are missing tracks; the patch's documented input is a
@@ -73,9 +78,10 @@ single-track MODE2/2352 image. Netplay/catalog admission is outside this test.
 
 ## Remaining work, in order
 
-1. Extend the verified new-game interface to a complete playable scene
-   and comparison with DuckStation. Preserve the original full EXE on the mounted
-   disc; isolate its shorter analysis view. Audio and gameplay are unverified.
+1. Extend the childhood introduction checks to voice/audio, normal saves,
+   choices and comparison with DuckStation. Preserve the original full EXE on
+   the mounted disc; isolate its shorter analysis view. The bounded visual/input
+   checks are not a full scene-parity or route validation.
 2. Classify the 13 loaded-image differences and trailing data. Either establish
    a byte-guarded common-code strategy with per-disc data or implement namespaced
    per-program dispatch. Test starting directly from every disc and loading saves.

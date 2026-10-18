@@ -76,7 +76,8 @@ def read_records(paths):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--framework", required=True, type=Path)
-    ap.add_argument("--captures", required=True, type=Path)
+    ap.add_argument("--captures", required=True, type=Path, nargs="+",
+                    help="One or more private capture snapshots to merge")
     ap.add_argument("--include-history", action="store_true",
                     help="Include the adjacent .d directory after the runtime has stopped")
     ap.add_argument("--output", required=True, type=Path)
@@ -89,12 +90,13 @@ def main():
         ["git", "-C", str(framework), "rev-parse", "HEAD"], text=True).strip()
     if revision != REVISION:
         ap.error("Framework revision differs from the pinned assessment")
-    paths = [args.captures.resolve()]
+    paths = [path.resolve() for path in args.captures]
     if args.include_history:
-        history = Path(str(paths[0]) + ".d")
-        if not history.is_dir():
-            ap.error("Capture history directory is missing")
-        paths.extend(sorted(history.glob("*.json")))
+        for snapshot in list(paths):
+            history = Path(str(snapshot) + ".d")
+            if not history.is_dir():
+                ap.error(f"Capture history directory is missing: {history}")
+            paths.extend(sorted(history.glob("*.json")))
     try:
         records = read_records(paths)
     except (KeyError, ValueError, OSError, TypeError) as error:

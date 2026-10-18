@@ -5,6 +5,11 @@ into its Windows executable. The runtime does not compile this batch during
 play. Interpreter fallback still handles uncovered code, so this remains an
 incomplete native port.
 
+This page records the initial 15-image batch. The later
+[childhood scene checks](SCENES.md) expand it to 46 images and verify dialogue
+transitions and map input. The older measurements below remain scoped to their
+original build.
+
 ## Measured results
 
 On 2026-10-18, a capture-enabled boot with runtime compilation disabled produced
@@ -104,7 +109,8 @@ a configuration error, preventing a silently empty overlay build.
 
 ## Remaining work
 
-Verify a complete interactive scene and compare it with DuckStation, expand
+Extend the [childhood scene checks](SCENES.md) to full audiovisual parity with
+DuckStation, expand
 disc-derived overlay recipes, replace remaining interpreted startup/BIOS paths,
 and implement native PC services and five-disc resource selection. The current
 hardware runtime and CPU fallback do not meet the final native release contract.
