@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 1,
+  "moduleSha256": "13267eac4b5f31bf8d07facd29faecd890d74368a5180d483b95a9a4c8d0c548",
+  "unicornVersion": "2.1.4",
+  "resetVectors": [
+    {
+      "initialVariables": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "finalVariables": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "resetFields": [
+        {
+          "address": "0x8011b574",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x80111550",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b5b0",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x80111554",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b3c0",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b570",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b5ac",
+          "width": 1,
+          "initialValue": 90,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b534",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        }
+      ],
+      "expectedEventHex": "010c000000000000",
+      "initialPc": 2149061173,
+      "expectedPc": 2149061173
+    },
+    {
+      "initialVariables": [
+        -2147483648,
+        -1,
+        0,
+        1,
+        -2147483648,
+        -1,
+        0,
+        1,
+        -2147483648,
+        -1,
+        0,
+        1,
+        -2147483648,
+        -1,
+        0,
+        1
+      ],
+      "finalVariables": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        -2147483648,
+        -1,
+        0,
+        1,
+        -2147483648,
+        -1,
+        0,
+        1
+      ],
+      "resetFields": [
+        {
+          "address": "0x8011b574",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x80111550",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b5b0",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x80111554",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b3c0",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b570",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b5ac",
+          "width": 1,
+          "initialValue": 90,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b534",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        }
+      ],
+      "expectedEventHex": "010c000000000000",
+      "initialPc": 2149061173,
+      "expectedPc": 2149061173
+    },
+    {
+      "initialVariables": [
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647
+      ],
+      "finalVariables": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647,
+        2147483647
+      ],
+      "resetFields": [
+        {
+          "address": "0x8011b574",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x80111550",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b5b0",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x80111554",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b3c0",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b570",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b5ac",
+          "width": 1,
+          "initialValue": 90,
+          "expectedValue": 0
+        },
+        {
+          "address": "0x8011b534",
+          "width": 4,
+          "initialValue": 305419896,
+          "expectedValue": 0
+        }
+      ],
+      "expectedEventHex": "010c000000000000",
+      "initialPc": 2149061173,
+      "expectedPc": 2149061173
+    }
+  ],
+  "hostDirectCompletionVectors": [
+    {
+      "hostPhase": 0,
+      "sceneContextByte3c": 0,
+      "currentTag": 0,
+      "sceneContextByte3d": 1,
+      "initialResumeGate": 1,
+      "expectedResumeGate": 1,
+      "expectedExternalTransition": false,
+      "observedStopAddress": "0x800f6b0c"
+    },
+    {
+      "hostPhase": 0,
+      "sceneContextByte3c": 5,
+      "currentTag": 5,
+      "sceneContextByte3d": 11,
+      "initialResumeGate": 1,
+      "expectedResumeGate": 1,
+      "expectedExternalTransition": false,
+      "observedStopAddress": "0x800f6b0c"
+    },
+    {
+      "hostPhase": 0,
+      "sceneContextByte3c": 255,
+      "currentTag": 255,
+      "sceneContextByte3d": 251,
+      "initialResumeGate": 1,
+      "expectedResumeGate": 1,
+      "expectedExternalTransition": false,
+      "observedStopAddress": "0x800f6b0c"
+    },
+    {
+      "hostPhase": 0,
+      "sceneContextByte3c": 2,
+      "currentTag": 3,
+      "sceneContextByte3d": 1,
+      "initialResumeGate": 1,
+      "expectedResumeGate": 1,
+      "expectedExternalTransition": false,
+      "observedStopAddress": "0x800f6b10"
+    },
+    {
+      "hostPhase": 0,
+      "sceneContextByte3c": 255,
+      "currentTag": 0,
+      "sceneContextByte3d": 21,
+      "initialResumeGate": 1,
+      "expectedResumeGate": 1,
+      "expectedExternalTransition": false,
+      "observedStopAddress": "0x800f6b10"
+    },
+    {
+      "hostPhase": 0,
+      "sceneContextByte3c": 7,
+      "currentTag": 7,
+      "sceneContextByte3d": 2,
+      "initialResumeGate": 1,
+      "expectedResumeGate": 0,
+      "expectedExternalTransition": true,
+      "observedStopAddress": "0x8003caa0"
+    }
+  ],
+  "limitations": [
+    "F0 is not a no-op: it resets state and returns a pending host event",
+    "The context-byte meaning and nontrivial resource transition are not reconstructed",
+    "External service behavior is not tested; no helper returns are fabricated"
+  ]
+}

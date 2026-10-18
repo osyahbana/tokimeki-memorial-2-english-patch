@@ -1,4 +1,14 @@
-# Tokimeki Memorial 2 English patch — improved edition
+# Tokimeki Memorial 2 — native PC port development
+
+This `native-port` branch contains an early C#/.NET engine reimplementation.
+**It is not a playable full-game port yet.** See [native engine instructions](native/README.md)
+for the executable, importer, tests, evidence and remaining work.
+
+The playable English patch remains on the fork's `improvements` branch. Its source
+and documentation are retained below because the native importer reuses its
+format parsers and translations.
+
+## English patch — improved edition
 
 A compatibility and reliability fork of [jonny-anime's English patch](https://github.com/jonny-anime/tokimeki-memorial-2-english-patch) for the five-disc Japanese PlayStation game.
 

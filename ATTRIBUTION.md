@@ -1,5 +1,13 @@
 # Attribution
 
+The `native-port` branch adds a C#/.NET engine reconstruction, local content importer,
+synthetic regression tests and machine-code-derived research maintained in
+[osyahbana's fork](https://github.com/osyahbana/tokimeki-memorial-2-english-patch).
+Its importer reuses the upstream format parsers and the translation data credited
+below. Original game assets are imported locally and are not part of the native
+engine distribution. Offline research used Capstone and Unicorn; neither is
+embedded in the native application.
+
 This is a derivative of **jonny-anime's Tokimeki Memorial 2 English patch**:
 
 - Original project: <https://github.com/jonny-anime/tokimeki-memorial-2-english-patch>

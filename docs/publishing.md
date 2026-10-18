@@ -1,5 +1,9 @@
 # Publish this source folder
 
+This page describes the playable English patch's `improvements` branch. Native
+engine development uses the separate `native-port` branch; publish those changes
+with `git push -u origin native-port`. See [native instructions](../native/README.md).
+
 The working branch is `improvements`. All seven original commits are retained. The remote `upstream` points to jonny-anime's project; `origin` points to [osyahbana's fork](https://github.com/osyahbana/tokimeki-memorial-2-english-patch).
 
 For future updates, open a terminal in this source folder and review/test the changes:

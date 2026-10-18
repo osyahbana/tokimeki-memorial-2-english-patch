@@ -43,3 +43,13 @@ dist/
 *.pyc
 *.log
 .env.*
+
+# Native port: locally imported game data, checkpoints and .NET build products
+native/data/
+native/**/bin/
+native/**/obj/
+native/**/publish/
+*.checkpoint.json
+*.user
+*.pdb
+*.cache
