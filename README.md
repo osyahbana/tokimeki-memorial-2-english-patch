@@ -13,8 +13,10 @@ The [static recompilation experiment](native/recomp/README.md) now builds a
 Windows executable that renders Disc 1's opening movie and reaches the English
 new-game interface. The [childhood scene checks](native/recomp/SCENES.md) now
 cover classroom dialogue, street encounters, the return home and map input.
-An expanded batch of 46 captured code images is compiled into the executable;
-a bounded map checkpoint records no dirty-RAM interpreter instructions.
+An expanded batch of 51 captured code images is compiled into the executable.
+The [scripted childhood replay](native/recomp/REPLAY.md) advances from a classroom
+checkpoint to the map-controls prompt across 9,035 sampled frames with zero
+recorded dirty-RAM interpreter instructions.
 The [overlay experiment](native/recomp/OVERLAYS.md) documents the earlier batch.
 A CD-controller seek status fix
 removes the initial black-screen stall. Significant game code still

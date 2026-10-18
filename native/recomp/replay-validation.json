@@ -1,0 +1,204 @@
+{
+  "date": "2026-10-18",
+  "framework_revision": "53a057f548cd1f93f1b4d8300caaeded72f4160d",
+  "framework_patches": [
+    1,
+    2,
+    3
+  ],
+  "source_disc": "English-patched Disc 1 identified in runtime-validation.json",
+  "runtime_compilation": "disabled",
+  "renderer": "software",
+  "bios": "bundled OpenBIOS, recompiled BIOS and default HLE boot/scheduler",
+  "native_only_release": false,
+  "generation": {
+    "distinct_images": 51,
+    "added_discovery_roots": 2059,
+    "translation_units": 65,
+    "guarded_function_identities": 28933,
+    "continuation_wrappers_included": 26009,
+    "isolated_interior_fragments": 27,
+    "failed_images": 0,
+    "skipped_images": 0,
+    "runtime_link": "passed"
+  },
+  "contextual_entries": {
+    "mode": "conditional exact containment",
+    "links": 17,
+    "added_canonical_dispatch_entries": 23,
+    "provenance_sha256": "b35c06f09ab931fd27d6ee44d22c5676969e379943d4c1744763b690e4df6f19",
+    "raw_capture_evidence_preserved": true,
+    "runtime_full_image_cooccurrence_not_asserted": true
+  },
+  "controller_route": {
+    "file": "routes/childhood-intro.json",
+    "steps": 81,
+    "scheduled_frames": 7440,
+    "sha256_lf_normalized": "cfa5b3f7d141c2fbfb48e435e4f67af6f6738acfe492b04328a86b31fc39ec08",
+    "hash_note": "Git blob with LF line endings; parsed steps match the executed route."
+  },
+  "negative_classroom_control": {
+    "runtime_sha256": "2f860288c544ee7a88477eb5ca413879cdc5d396d1461f5c9f838ea731f79577",
+    "frame_target_reached": true,
+    "last_sample_frame": 957,
+    "dirty_ram_instructions": 3460,
+    "static_overlay_hits": 248858,
+    "interpreter_aborts": 0,
+    "owned_runtime_exit_code": 0,
+    "checkpoint_sha256": "467def8d0c317e25dbbf38b8a88ec25f7d64e56bd6b9a359071efa7948ac2665",
+    "checkpoint_loaded": true,
+    "baseline_frame": 355,
+    "additional_sampled_frames": 602,
+    "additional_dirty_ram_instructions": 3030,
+    "additional_static_overlay_hits": 193035,
+    "fallback_budget": {
+      "limit": 0,
+      "additional_instructions": 3030,
+      "passed": false,
+      "reason": "measured"
+    }
+  },
+  "intermediate_48_image_replay": {
+    "runtime_sha256": "b15b0d9174b11f9ada090284a0e4f4977dcd84334b6f47c7eed8afeaed70536f",
+    "frame_target_reached": true,
+    "last_sample_frame": 9199,
+    "dirty_ram_instructions": 10,
+    "static_overlay_hits": 3653389,
+    "interpreter_aborts": 0,
+    "owned_runtime_exit_code": 0,
+    "checkpoint_sha256": "467def8d0c317e25dbbf38b8a88ec25f7d64e56bd6b9a359071efa7948ac2665",
+    "checkpoint_loaded": true,
+    "baseline_frame": 127,
+    "additional_sampled_frames": 9072,
+    "additional_dirty_ram_instructions": 10,
+    "additional_static_overlay_hits": 3621543,
+    "fallback_budget": {
+      "limit": 0,
+      "additional_instructions": 10,
+      "passed": false,
+      "reason": "measured"
+    },
+    "input_route": {
+      "start": {
+        "id": 0,
+        "ok": true,
+        "steps": 81,
+        "start_frame": 182
+      },
+      "completed": true,
+      "status": {
+        "id": 0,
+        "ok": true,
+        "active": false,
+        "steps": 81,
+        "index": 81,
+        "remaining": 0
+      }
+    }
+  },
+  "intermediate_51_image_replay_without_context": {
+    "runtime_sha256": "7aef89459bc20dd775fe0e8e9e060f1d95729b2c8d202600f381883b700957e0",
+    "frame_target_reached": true,
+    "last_sample_frame": 9171,
+    "dirty_ram_instructions": 10,
+    "static_overlay_hits": 3631410,
+    "interpreter_aborts": 0,
+    "owned_runtime_exit_code": 0,
+    "checkpoint_sha256": "467def8d0c317e25dbbf38b8a88ec25f7d64e56bd6b9a359071efa7948ac2665",
+    "checkpoint_loaded": true,
+    "baseline_frame": 170,
+    "additional_sampled_frames": 9001,
+    "additional_dirty_ram_instructions": 10,
+    "additional_static_overlay_hits": 3594490,
+    "fallback_budget": {
+      "limit": 0,
+      "additional_instructions": 10,
+      "passed": false,
+      "reason": "measured"
+    },
+    "input_route": {
+      "start": {
+        "id": 0,
+        "ok": true,
+        "steps": 81,
+        "start_frame": 231
+      },
+      "completed": true,
+      "status": {
+        "id": 0,
+        "ok": true,
+        "active": false,
+        "steps": 81,
+        "index": 81,
+        "remaining": 0
+      }
+    }
+  },
+  "final_contextual_replay": {
+    "runtime_sha256": "bf0c27ff5d84a1f90feade9b06ca2491eb0f2bf39052a11724948a234382ffbc",
+    "frame_target_reached": true,
+    "last_sample_frame": 9202,
+    "dirty_ram_instructions": 0,
+    "static_overlay_hits": 3642894,
+    "interpreter_aborts": 0,
+    "owned_runtime_exit_code": 0,
+    "checkpoint_sha256": "467def8d0c317e25dbbf38b8a88ec25f7d64e56bd6b9a359071efa7948ac2665",
+    "checkpoint_loaded": true,
+    "baseline_frame": 167,
+    "additional_sampled_frames": 9035,
+    "additional_dirty_ram_instructions": 0,
+    "additional_static_overlay_hits": 3602788,
+    "fallback_budget": {
+      "limit": 0,
+      "additional_instructions": 0,
+      "passed": true,
+      "reason": "measured"
+    },
+    "input_route": {
+      "start": {
+        "id": 0,
+        "ok": true,
+        "steps": 81,
+        "start_frame": 243
+      },
+      "completed": true,
+      "status": {
+        "id": 0,
+        "ok": true,
+        "active": false,
+        "steps": 81,
+        "index": 81,
+        "remaining": 0
+      }
+    }
+  },
+  "final_cold_boot": {
+    "runtime_sha256": "bf0c27ff5d84a1f90feade9b06ca2491eb0f2bf39052a11724948a234382ffbc",
+    "frame_target_reached": true,
+    "last_sample_frame": 6037,
+    "dirty_ram_instructions": 33,
+    "static_overlay_hits": 6766485,
+    "interpreter_aborts": 0,
+    "owned_runtime_exit_code": 0
+  },
+  "earlier_46_image_cold_boot": {
+    "runtime_sha256": "2f860288c544ee7a88477eb5ca413879cdc5d396d1461f5c9f838ea731f79577",
+    "frame_target_reached": true,
+    "last_sample_frame": 6063,
+    "dirty_ram_instructions": 39147070,
+    "static_overlay_hits": 1816080,
+    "interpreter_aborts": 0,
+    "owned_runtime_exit_code": 0
+  },
+  "remaining_cold_boot_dispatch_sites": [
+    "0x0001154C",
+    "0x00011364"
+  ],
+  "validation": {
+    "synthetic_tests_passed": 21,
+    "contextual_inputs_and_provenance_reproduced_byte_for_byte": true,
+    "replay_visual_observation": "Classroom to street encounter, return home and neighborhood map-controls prompt",
+    "cold_boot_visual_observation": "Opening movie rendered",
+    "scope": "Asynchronous sampled counters; not pixel parity, speedup or full-game native coverage. Normal saves, audio, complete routes and five-disc transitions remain unverified."
+  }
+}

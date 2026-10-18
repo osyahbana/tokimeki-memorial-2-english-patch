@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -73,6 +74,76 @@ def read_records(paths):
     return list(records.values())
 
 
+def contextualize_entries(records):
+    """Derive guarded entry candidates in byte-identical containing images.
+
+    This is conditional code-entry reuse, not evidence that the whole containing
+    variant was observed at the same time. Raw captures remain unchanged.
+    """
+    derived = copy.deepcopy(records)
+    blobs = [base64.b64decode(r["bytes_b64"], validate=True) for r in records]
+    provenance = []
+
+    def normalized(values):
+        return {f"0x{int(pc, 16):08X}" for pc in values}
+
+    for result in derived:
+        original = normalized(result.get("dispatch_entry_pcs", []))
+        segments = {name: sorted(normalized(pcs))
+                    for name, pcs in result.get("dispatch_entry_segments", {}).items()}
+        labelled = {int(pc, 16) & 0x1fffffff for pcs in segments.values() for pc in pcs}
+        implicit = {pc for pc in original if (int(pc, 16) & 0x1fffffff) not in labelled}
+        if implicit:
+            segments["kseg0"] = sorted(set(segments.get("kseg0", [])) | implicit)
+        result["dispatch_entry_pcs"] = sorted(original)
+        result["dispatch_entry_segments"] = segments
+    for source_index, source in enumerate(records):
+        lo = int(source["load_addr"], 16)
+        hi = lo + source["size"] - source["guard_bytes"]
+        entries = {pc for pc in normalized(source.get("dispatch_entry_pcs", []))
+                   if lo <= int(pc, 16) < hi and int(pc, 16) % 4 == 0}
+        if not entries:
+            continue
+        entry_phys = {int(pc, 16) & 0x1fffffff for pc in entries}
+        for target_index, target in enumerate(records):
+            offset = lo - int(target["load_addr"], 16)
+            if (source["schema"] != target["schema"] or source["size"] >= target["size"]
+                    or offset < 0 or offset + source["size"] > target["size"]
+                    or hi > int(target["load_addr"], 16) + target["size"] - target["guard_bytes"]
+                    or blobs[target_index][offset:offset + source["size"]] != blobs[source_index]):
+                continue
+            result = derived[target_index]
+            before = set(result.get("dispatch_entry_pcs", []))
+            segments = result.setdefault("dispatch_entry_segments", {})
+            additions = {}
+            # Preserve each observed segment; unlabelled entries keep the
+            # compiler's documented KSEG0 interpretation. Never add aliases.
+            labelled = set()
+            for segment, pcs in source.get("dispatch_entry_segments", {}).items():
+                keep = {pc for pc in normalized(pcs) if (int(pc, 16) & 0x1fffffff) in entry_phys}
+                labelled |= {int(pc, 16) & 0x1fffffff for pc in keep}
+                added = keep - set(segments.get(segment, []))
+                if added:
+                    additions[segment] = sorted(added)
+                    segments[segment] = sorted(set(segments.get(segment, [])) | added)
+            unlabelled = {pc for pc in entries if (int(pc, 16) & 0x1fffffff) not in labelled}
+            added = unlabelled - set(segments.get("kseg0", []))
+            if added:
+                additions.setdefault("kseg0", []).extend(sorted(added))
+                segments["kseg0"] = sorted(set(segments.get("kseg0", [])) | added)
+            result["dispatch_entry_pcs"] = sorted(before | entries)
+            if entries - before or additions:
+                provenance.append({
+                    "source_sha256": hashlib.sha256(blobs[source_index]).hexdigest(),
+                    "source_load_addr": source["load_addr"],
+                    "target_sha256": hashlib.sha256(blobs[target_index]).hexdigest(),
+                    "target_load_addr": target["load_addr"],
+                    "added_dispatch_entries": sorted(entries - before),
+                    "added_segments": additions,
+                    "basis": "Exact containment including guard bytes; conditional entry candidates only"})
+    return derived, provenance
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--framework", required=True, type=Path)
@@ -80,6 +151,8 @@ def main():
                     help="One or more private capture snapshots to merge")
     ap.add_argument("--include-history", action="store_true",
                     help="Include the adjacent .d directory after the runtime has stopped")
+    ap.add_argument("--contextual-entries", action="store_true",
+                    help="Derive entry candidates in byte-identical containing images")
     ap.add_argument("--output", required=True, type=Path)
     args = ap.parse_args()
     framework, out = args.framework.resolve(), args.output.resolve()
@@ -104,15 +177,27 @@ def main():
     out.mkdir(parents=True)
     merged = out / "captures.json"
     merged.write_text(json.dumps(records, indent=2) + "\n", encoding="utf-8")
+    compilation_input = merged
+    if args.contextual_entries:
+        contextual, provenance = contextualize_entries(records)
+        compilation_input = out / "contextual-captures.json"
+        compilation_input.write_text(json.dumps(contextual, indent=2) + "\n", encoding="utf-8")
+        (out / "entry-context.json").write_text(json.dumps(provenance, indent=2) + "\n", encoding="utf-8")
     subprocess.run([sys.executable, str(framework / "tools/enrich_overlay_captures.py"),
-                    "--captures", str(merged), "--out", str(out / "enriched.json")], check=True)
+                    "--captures", str(compilation_input), "--out", str(out / "enriched.json")], check=True)
     summary = [{"load_addr": r["load_addr"], "size": r["size"],
                 "sha256": hashlib.sha256(base64.b64decode(r["bytes_b64"])).hexdigest(),
                 "dispatch_entries": len(r.get("dispatch_entry_pcs", []))} for r in records]
-    (out / "inventory.json").write_text(json.dumps({
+    inventory = {
         "framework_revision": revision,
         "scope": "Observed runtime code variants; not complete disc coverage",
-        "records": summary}, indent=2) + "\n", encoding="utf-8")
+        "records": summary}
+    if args.contextual_entries:
+        inventory["entry_context"] = {
+            "mode": "conditional exact containment", "links": len(provenance),
+            "added_dispatch_entries": sum(len(link["added_dispatch_entries"]) for link in provenance),
+            "raw_capture_file": "captures.json", "derived_capture_file": "contextual-captures.json"}
+    (out / "inventory.json").write_text(json.dumps(inventory, indent=2) + "\n", encoding="utf-8")
     print(f"Prepared {len(records)} records in {out}")
 
 

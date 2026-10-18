@@ -39,8 +39,9 @@ retain the original gameplay logic through static recompilation. Prioritize a
 Disc 1 runtime validation, then overlay coverage and the five-disc program
 differences. The runtime links and executes compiled childhood overlays through
 classroom/street dialogue and map input, documented in the
-[scene checks](recomp/SCENES.md). A bounded map checkpoint records zero dirty-RAM
-interpreter instructions; startup and broader coverage still need work. The milestones
+[scene checks](recomp/SCENES.md). The later [scripted introduction replay](recomp/REPLAY.md)
+records zero dirty-RAM interpreter instructions over 9,035 frames after a
+classroom checkpoint load; startup and broader coverage still need work. The milestones
 below describe the existing C# reconstruction;
 they are not prerequisites for that separate recompilation experiment.
 

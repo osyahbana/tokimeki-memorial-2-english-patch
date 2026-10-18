@@ -5,7 +5,69 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from prepare_overlays import read_records
+from prepare_overlays import read_records, contextualize_entries
+
+
+class EntryContextTests(unittest.TestCase):
+    def pair(self):
+        data = bytes(range(32))
+        big = {"schema": "psxrecomp overlay capture v3", "load_addr": "0x800C0000",
+               "size": 32, "guard_bytes": 4, "bytes_b64": base64.b64encode(data).decode(),
+               "dispatch_entry_pcs": ["0x800C0000"]}
+        small = {"schema": big["schema"], "load_addr": "0x800C0008", "size": 12,
+                 "guard_bytes": 4, "bytes_b64": base64.b64encode(data[8:20]).decode(),
+                 "dispatch_entry_pcs": ["0x800c0008"],
+                 "dispatch_entry_segments": {"kuseg": ["0x000c0008"]}}
+        return [big, small]
+
+    def test_matching_context_preserves_raw_evidence_and_observed_segments(self):
+        records = self.pair()
+        before = copy.deepcopy(records)
+        contextual, links = contextualize_entries(records)
+        self.assertEqual(records, before)
+        self.assertEqual(contextual[0]["dispatch_entry_pcs"], ["0x800C0000", "0x800C0008"])
+        self.assertEqual(contextual[0]["dispatch_entry_segments"],
+                         {"kseg0": ["0x800C0000"], "kuseg": ["0x000C0008"]})
+        self.assertEqual(len(links), 1)
+        self.assertNotIn("function_entry_pcs", contextual[0])
+
+    def test_mismatch_in_code_or_guard_prevents_transfer(self):
+        for offset in (0, 11):
+            records = self.pair()
+            data = bytearray(base64.b64decode(records[1]["bytes_b64"]))
+            data[offset] ^= 255
+            records[1]["bytes_b64"] = base64.b64encode(data).decode()
+            with self.subTest(offset=offset):
+                self.assertEqual(contextualize_entries(records)[1], [])
+
+    def test_uncontained_or_guard_entry_is_not_transferred(self):
+        records = self.pair()
+        records[1]["load_addr"] = "0x800D0008"
+        records[1]["dispatch_entry_pcs"] = ["0x800D0008"]
+        records[1]["dispatch_entry_segments"] = {"kuseg": ["0x000D0008"]}
+        self.assertEqual(contextualize_entries(records)[1], [])
+        records = self.pair()
+        records[1]["dispatch_entry_pcs"] = ["0x800C0010"]
+        self.assertEqual(contextualize_entries(records)[1], [])
+
+    def test_existing_implicit_kseg0_is_not_lost_when_adding_kuseg(self):
+        records = self.pair()
+        records[0]["dispatch_entry_pcs"].append("0x800C0008")
+        contextual, _ = contextualize_entries(records)
+        self.assertIn("0x800C0008", contextual[0]["dispatch_entry_segments"]["kseg0"])
+        self.assertIn("0x000C0008", contextual[0]["dispatch_entry_segments"]["kuseg"])
+
+    def test_full_variants_remain_distinct_when_only_fragment_matches(self):
+        records = self.pair()
+        variant = copy.deepcopy(records[0])
+        data = bytearray(base64.b64decode(variant["bytes_b64"]))
+        data[24] ^= 255
+        variant["bytes_b64"] = base64.b64encode(data).decode()
+        records.append(variant)
+        contextual, links = contextualize_entries(records)
+        self.assertEqual(len(contextual), 3)
+        self.assertNotEqual(contextual[0]["bytes_b64"], contextual[2]["bytes_b64"])
+        self.assertEqual(len(links), 2)
 
 
 class CaptureIdentityTests(unittest.TestCase):

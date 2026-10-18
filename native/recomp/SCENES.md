@@ -7,6 +7,10 @@ scheduling. Runtime overlay compilation is disabled. This is progress toward
 the [native release contract](../ROADMAP.md#required-final-deliverable), not a
 finished native PC port.
 
+The measurements below document the earlier 46-image batch. The later
+[controller replay](REPLAY.md) uses 51 images and matching larger code context
+to pass a zero-fallback check through the classroom-to-map introduction.
+
 ## Observed progression
 
 With the initial 15-image build, an interactive run proceeded from name entry

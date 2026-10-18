@@ -26,6 +26,46 @@ def checkpoint_slot(source, game):
     return int(match[2])
 
 
+def read_input_route(path):
+    """Accept bounded digital-pad steps, not arbitrary debug commands."""
+    steps = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(steps, list) or not 1 <= len(steps) <= 4096:
+        raise ValueError("Input route must contain 1..4096 steps")
+    for step in steps:
+        if (not isinstance(step, dict) or set(step) != {"buttons", "frames"}
+                or type(step["buttons"]) is not int or not 0 <= step["buttons"] <= 65535
+                or type(step["frames"]) is not int or not 1 <= step["frames"] <= 1000000):
+            raise ValueError("Each route step needs integer buttons (0..65535) and frames (1..1000000)")
+    if sum(step["frames"] for step in steps) > 1000000 or steps[-1]["buttons"] != 65535:
+        raise ValueError("Route must end with neutral buttons and total at most 1000000 frames")
+    return steps
+
+
+def start_input_route(client, port, steps):
+    # Fail on an uncertain mutation rather than replaying inputs after a timeout.
+    try:
+        for command in ([{"cmd": "input_route_clear"}]
+                        + [{"cmd": "input_route_append", **step} for step in steps]
+                        + [{"cmd": "input_route_start"}]):
+            result = client.query("127.0.0.1", port, command, timeout=3)
+            if not result.get("ok"):
+                raise RuntimeError(f"Input route command failed: {result}")
+        return result
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"Input route setup failed: {error}") from error
+
+
+def check_fallback_budget(baseline, final, limit):
+    """Missing or reset counters cannot pass a native-coverage check."""
+    before, after = baseline.get("insns_run"), final.get("insns_run")
+    valid = (baseline.get("ok") is True and final.get("ok") is True
+             and type(before) is int and type(after) is int and 0 <= before <= after)
+    delta = after - before if valid else None
+    return {"limit": limit, "additional_instructions": delta,
+            "passed": valid and delta <= limit,
+            "reason": "measured" if valid else "counter missing, invalid or reset"}
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--framework", required=True, type=Path)
@@ -38,6 +78,10 @@ def main():
     ap.add_argument("--after-load-frames", type=int, help="Sample this many frames after confirmed load")
     ap.add_argument("--dump-overlays", action="store_true",
                     help="Flush enabled overlay capture evidence before stopping")
+    ap.add_argument("--input-route", type=Path,
+                    help="JSON digital-pad steps to run after boot/checkpoint load")
+    ap.add_argument("--max-ram-fallback", type=int,
+                    help="Fail if dirty-RAM interpretation after checkpoint load exceeds this count")
     ap.add_argument("--port", type=int, default=44362)
     args = ap.parse_args()
     if not 1 <= args.seconds <= 1800 or not 1024 <= args.port <= 65535:
@@ -47,6 +91,8 @@ def main():
     if args.after_load_frames is not None and (not args.load_state or args.frames is not None
                                                or not 1 <= args.after_load_frames <= 1000000):
         ap.error("--after-load-frames requires --load-state, 1..1000000 frames, and no --frames")
+    if args.max_ram_fallback is not None and (not args.load_state or args.max_ram_fallback < 0):
+        ap.error("--max-ram-fallback requires --load-state and a nonnegative count")
     out = args.output.resolve()
     source_repo = Path(__file__).resolve().parents[2]
     if out.is_relative_to(source_repo) or source_repo.is_relative_to(out):
@@ -58,6 +104,12 @@ def main():
     if not all(p.is_file() for p in (exe, game, client_path)):
         ap.error("Runtime, game config or debug client is missing")
     slot = None
+    route = None
+    if args.input_route:
+        try:
+            route = read_input_route(args.input_route)
+        except (ValueError, OSError) as error:
+            ap.error(str(error))
     if args.load_state:
         args.load_state = args.load_state.resolve()
         try:
@@ -89,6 +141,8 @@ def main():
               "environment": {key: value for key, value in os.environ.items()
                               if key in ("PSX_HLE_SCHEDULER", "PSX_BIOS_HLE", "PSX_BIOS_HLE_KEEP_INTRO", "PSX_FORCE_INTERP",
                                          "PSX_OVERLAY_AUTOCOMPILE_OFF", "PSX_OVERLAY_CAPTURES")}}
+    if route:
+        report["input_route"] = {"steps": route, "start": None, "completed": False}
     if args.load_state:
         report["checkpoint"] = {"source": str(args.load_state), "slot": slot,
                                 "sha256": hashlib.sha256(destination.read_bytes()).hexdigest()}
@@ -127,6 +181,10 @@ def main():
                             if args.after_load_frames is not None:
                                 target_frame = report["resume_baseline"]["frame"]["frame"] + args.after_load_frames
                             report["resolved_frame_target"] = target_frame
+                    if (route and report["input_route"]["start"] is None
+                            and state.get("frame", 0) > 0
+                            and (not args.load_state or report["checkpoint_loaded"])):
+                        report["input_route"]["start"] = start_input_route(client, args.port, route)
                     if elapsed >= next_capture:
                         shot = out / f"frame-{len(events):03d}.png"
                         result = client.query("127.0.0.1", args.port,
@@ -141,6 +199,13 @@ def main():
                 time.sleep(1)
             report["exit_before_cleanup"] = process.poll()
             if connected and process.poll() is None:
+                if route:
+                    status = client.query("127.0.0.1", args.port, {"cmd": "input_route_status"}, timeout=3)
+                    report["input_route"]["status"] = status
+                    report["input_route"]["completed"] = bool(
+                        report["input_route"]["start"] and status.get("ok")
+                        and status.get("active") is False and status.get("index") == len(route)
+                        and status.get("steps") == len(route))
                 if args.dump_overlays:
                     try:
                         diagnostics["overlay_capture_dump"] = client.query(
@@ -159,7 +224,14 @@ def main():
                         {"cmd": "screenshot_file", "path": (out / "final.png").as_posix()}, timeout=3)
                 except (OSError, ValueError) as error:
                     diagnostics["final_screenshot"] = {"error": str(error)}
+        except (RuntimeError, OSError, ValueError, KeyError) as error:
+            report["error"] = str(error)
+            raise
         finally:
+            if args.max_ram_fallback is not None:
+                report["fallback_budget"] = check_fallback_budget(
+                    report.get("resume_baseline", {}).get("dirty_ram_stats", {}),
+                    diagnostics.get("dirty_ram_stats", {}), args.max_ram_fallback)
             if connected and process.poll() is None:
                 try:
                     client.query("127.0.0.1", args.port, {"cmd": "quit"}, timeout=2)
@@ -179,8 +251,12 @@ def main():
             (out / "report.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
     print(json.dumps({"connected": connected, "samples": len(events),
                       "exit_before_cleanup": report.get("exit_before_cleanup"),
+                      "fallback_budget": report.get("fallback_budget"),
+                      "input_route_completed": report.get("input_route", {}).get("completed"),
                       "report": str(out / "report.json")}))
     return 0 if (connected and report.get("exit_before_cleanup") is None
+                 and (args.max_ram_fallback is None or report["fallback_budget"]["passed"])
+                 and (not route or report["input_route"]["completed"])
                  and (not args.dump_overlays or diagnostics.get("overlay_capture_dump", {}).get("ok"))
                  and (not args.load_state or report["checkpoint_loaded"])
                  and (target_frame is None or report["frame_target_reached"])) else 2

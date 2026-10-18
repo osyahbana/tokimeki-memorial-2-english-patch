@@ -71,6 +71,12 @@ investigation stages without depending on Claude-specific agents or hooks.
   A 46-image batch records zero dirty-RAM interpreter instructions during a
   bounded map checkpoint. This result is specific to that interval; startup,
   other scenes, normal saves, audio and later discs remain separate obligations.
+- The [scripted introduction replay](REPLAY.md) uses a 51-image build and exact
+  containment of captured bytes to resolve continuations within larger code
+  images. It advances from the classroom to the map-controls prompt for 9,035
+  sampled frames with zero dirty-RAM interpreter instructions and zero recorded
+  interpreter aborts. The fallback-budget check rejects earlier builds that
+  still interpret code; this does not establish native-only full-game execution.
 
 The probe emits a generic one-track warning. It is not evidence that these
 particular discs are missing tracks; the patch's documented input is a
