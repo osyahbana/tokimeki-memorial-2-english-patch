@@ -1,9 +1,13 @@
 # Disc 1 runtime bring-up
 
-The Windows x64 runtime links and renders the opening movie from the documented
+The baseline Windows x64 runtime links and renders the opening movie from the documented
 English-patched Disc 1. This is an incomplete recompilation experiment. It does
 not establish a fully native port, playable routes, correct audio, save support
 or automatic disc changes. Keep using the English patch in DuckStation for play.
+
+Follow-up: [static overlay execution](OVERLAYS.md) now reduces fallback and
+reaches the English new-game/name-entry interface. The measurements below
+describe the earlier baseline and remain useful for reproducing the CD fix.
 
 ## Build corrections
 
@@ -94,8 +98,9 @@ The fixed 45-second session recorded 118,666,453 interpreted instructions,
 74,361 native handoffs and no recorded interpreter aborts. These counters do
 not share a denominator and must not be converted into a native percentage.
 Frequent fallback addresses include `0x000C3690`, `0x000C09D4` and `0x000C3D28`.
-Native overlay generation is disabled for this first boot probe; the main
-engine at `0x800C0000` remains a major coverage gap.
+Native overlay generation is disabled for this first boot probe. Several
+different modules reuse `0x800C0000`; addresses alone do not identify the main
+game engine. The follow-up matches some observed code to sectors 543 and 717.
 
 The profile is REFERENCE, with the default HLE boot/thread scheduling behavior
 and the bundled OpenBIOS backend. REFERENCE does not mean all HLE is disabled.

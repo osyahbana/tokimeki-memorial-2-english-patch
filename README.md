@@ -10,8 +10,11 @@ and overlay execution, PC backends, and automatic access to all five discs.
 The current prototype does not meet that requirement.
 
 The [static recompilation experiment](native/recomp/README.md) now builds a
-Windows executable that renders Disc 1's opening movie. A CD-controller seek
-status fix removes the initial black-screen stall. Significant game code still
+Windows executable that renders Disc 1's opening movie and reaches the English
+new-game/name-entry interface. An initial batch of overlays is compiled into
+the executable; the [overlay experiment](native/recomp/OVERLAYS.md) measures
+the resulting reduction in interpreter use. A CD-controller seek status fix
+removes the initial black-screen stall. Significant game code still
 uses interpreter fallback; full gameplay and automatic disc changes are not
 implemented or validated. The existing C# client remains useful for research.
 

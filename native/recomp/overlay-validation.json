@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-18",
+  "framework_revision": "53a057f548cd1f93f1b4d8300caaeded72f4160d",
+  "framework_patches": [1, 2, 3],
+  "runtime_sha256": "edd20f6233b1088c2a69674df0b81f62885edda5d7b9bf64b77e3fd02e3910f3",
+  "source_disc": "English-patched Disc 1 as identified in runtime-validation.json",
+  "generation": {
+    "input_observations": 19,
+    "distinct_images_after_evidence_union": 15,
+    "added_discovery_roots": 300,
+    "translation_units": 21,
+    "guarded_function_identities": 3671,
+    "continuation_wrappers_included_in_identities": 3167,
+    "reported_failures": 0,
+    "runtime_link": "passed"
+  },
+  "bounded_comparison": {
+    "sampled_frame_target": 6000,
+    "runtime_compilation": "disabled",
+    "renderer": "software",
+    "baseline": {
+      "last_sample_frame": 6057,
+      "register_diagnostic_frame": 6058,
+      "interpreted_instructions": 187707287,
+      "static_overlay_hits": 0,
+      "interpreter_aborts": 0
+    },
+    "static_overlays": {
+      "last_sample_frame": 6006,
+      "register_diagnostic_frame": 6006,
+      "interpreted_instructions": 40105619,
+      "static_overlay_hits": 1598576,
+      "interpreter_aborts": 0
+    },
+    "visual_check": "Both render the same opening lyric passage at different animation frames; no pixel-parity assertion.",
+    "limitation": "Asynchronous samples, slightly different frame counts. Fallback reduction is not native execution coverage or a performance measurement."
+  },
+  "interactive_180_second_run": {
+    "last_sample_frame": 18441,
+    "interpreted_instructions": 172603562,
+    "static_overlay_hits": 423765,
+    "interpreter_aborts": 0,
+    "verified_screens": ["File Select Room", "Start a new game?", "Your last name?"],
+    "verified_input": "New -> Yes -> English name entry using individual Circle, Up, Circle inputs after a recorded Start/Circle pulse route",
+    "complete_scene": "not verified",
+    "audio": "not verified",
+    "save_load": "not verified",
+    "five_disc_progression": "not implemented",
+    "fully_native_execution": false
+  },
+  "synthetic_regression_tests": 7,
+  "private_artifacts": "Captured game bytes, generated C, screenshots and full traces remain outside the source repository."
+}

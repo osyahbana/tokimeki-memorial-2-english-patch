@@ -4,10 +4,14 @@ project(TM2Recompiled LANGUAGES C CXX)
 set(PSXRECOMP_ROOT "" CACHE PATH "Pinned PSXRecomp checkout")
 set(TM2_GENERATED_DIR "" CACHE PATH "Private generated Disc 1 C directory")
 set(TM2_GAME_CONFIG "" CACHE FILEPATH "Private game.toml with local disc paths")
+set(TM2_STATIC_OVERLAYS "" CACHE FILEPATH "Private generated overlays_static.c")
 if(NOT EXISTS "${PSXRECOMP_ROOT}/runtime/runtime.cmake" OR
    NOT EXISTS "${TM2_GENERATED_DIR}/boot-loaded.exe_dispatch.c" OR
    NOT EXISTS "${TM2_GAME_CONFIG}")
     message(FATAL_ERROR "Set PSXRECOMP_ROOT, TM2_GENERATED_DIR and TM2_GAME_CONFIG to prepared local inputs")
+endif()
+if(TM2_STATIC_OVERLAYS AND NOT EXISTS "${TM2_STATIC_OVERLAYS}")
+    message(FATAL_ERROR "TM2_STATIC_OVERLAYS was specified but does not exist")
 endif()
 
 add_executable(tm2-cdrom-regression test_cdrom_seek.c)
@@ -32,6 +36,7 @@ psxrecomp_add_game_runtime(psx-runtime
     WINDOW_TITLE "Tokimeki Memorial 2 - Recompilation Research"
     DEFAULT_GAME_CONFIG_PATH "${TM2_GAME_CONFIG}"
     MAX_PLAYERS 1
+    GAME_OVERLAY_STATIC_C "${TM2_STATIC_OVERLAYS}"
     GEN_MARKER "${TM2_GENERATED_DIR}/boot-loaded.exe_dispatch.c"
     GEN_FULL_GLOB "${TM2_GENERATED_DIR}/boot-loaded.exe_full_*.c")
 

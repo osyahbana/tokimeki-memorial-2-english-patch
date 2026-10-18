@@ -1,7 +1,8 @@
 # Static recompilation experiment
 
 Tested on 2026-10-18 against the five English-patched original-release images.
-**Disc 1 now links and renders its opening movie using PSXRecomp.**
+**Disc 1 now executes an initial batch of compiled overlays and reaches the
+English new-game/name-entry interface using PSXRecomp.**
 Keep the C# client as a format/behavior research tool. Neither route currently
 provides a playable native Tokimeki Memorial 2 build.
 
@@ -58,8 +59,13 @@ investigation stages without depending on Claude-specific agents or hooks.
   CD-controller correction described in [runtime validation](RUNTIME.md).
 - The 45-second fixed-runtime probe recorded **118,666,453 interpreted
   instructions** and **74,361 native handoffs**. These different counters are
-  not a native coverage percentage. Main-engine overlay addresses dominate
+  not a native coverage percentage. Overlay addresses dominate
   fallback; the linked executable is **not yet a fully native game port**.
+- The subsequent [static overlay experiment](OVERLAYS.md) links 15 distinct
+  captured images and records 1,598,576 static hits near frame 6,000. Interpreted
+  instructions fall from 187,707,287 to 40,105,619 in comparable bounded runs.
+  A separate input run reaches File Select, the new-game confirmation and English
+  name entry. This establishes menu interaction, not a complete playable scene.
 
 The probe emits a generic one-track warning. It is not evidence that these
 particular discs are missing tracks; the patch's documented input is a
@@ -67,7 +73,7 @@ single-track MODE2/2352 image. Netplay/catalog admission is outside this test.
 
 ## Remaining work, in order
 
-1. Extend the opening-movie smoke test to title input, a complete playable scene
+1. Extend the verified new-game interface to a complete playable scene
    and comparison with DuckStation. Preserve the original full EXE on the mounted
    disc; isolate its shorter analysis view. Audio and gameplay are unverified.
 2. Classify the 13 loaded-image differences and trailing data. Either establish
